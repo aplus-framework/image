@@ -1,11 +1,11 @@
 {
 	"name": "framework/image",
 	"type": "library",
-	"description": "The Image package",
+	"description": "The Framework Image Library",
 	"keywords": [
 		"image"
 	],
-	"homepage": "https://gitlab.com/the-framework/image",
+	"homepage": "https://the-framework.gitlab.io/libraries/image.html",
 	"license": "proprietary",
 	"authors": [
 		{
@@ -53,9 +53,9 @@
 	},
 	"support": {
 		"email": "natanfelles@gmail.com",
-		"issues": "https://gitlab.com/the-framework/image/issues",
-		"wiki": "https://gitlab.com/the-framework/packages/image",
-		"source": "https://gitlab.com/the-framework/image",
-		"docs": "https://the-framework.gitlab.io/the-framework/packages/image/docs"
+		"issues": "https://gitlab.com/the-framework/libraries/image/issues",
+		"wiki": "https://gitlab.com/the-framework/libraries/image/wikis/home",
+		"source": "https://gitlab.com/the-framework/libraries/image",
+		"docs": "https://the-framework.gitlab.io/libraries/image/docs/"
 	}
 }
