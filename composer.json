@@ -6,7 +6,7 @@
 		"image"
 	],
 	"homepage": "https://the-framework.gitlab.io/libraries/image.html",
-	"license": "proprietary",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Natan Felles",
