@@ -38,15 +38,15 @@ class Image
 	public function __construct(string $filename)
 	{
 		if ( ! \is_readable($filename)) {
-			throw new \Exception('File "' . $filename . '" does not exists or is not readable.');
+			throw new \InvalidArgumentException('File "' . $filename . '" does not exists or is not readable.');
 		}
 		$this->filename = $filename;
 		$info = \getimagesize($this->filename);
 		if ($info === false) {
-			throw new \Exception('Could not get info of the given image filename');
+			throw new \RuntimeException('Could not get info of the given image filename');
 		}
 		if ( ! (\imagetypes() & $info[2])) {
-			throw new \Exception('Unsupported image type.');
+			throw new \RuntimeException('Unsupported image type.');
 		}
 		//\var_dump($info);exit;
 		$this->type = $info[2];
@@ -62,7 +62,7 @@ class Image
 				$this->resource = \imagecreatefromgif($filename);
 				break;
 			default:
-				throw new \Exception('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
 		}
 	}
 
@@ -71,44 +71,6 @@ class Image
 		$this->destroy();
 	}
 
-	/*
-	// USE ONLY IN CREATED - NOT IN MANIPULATED ONLY
-	public function create(int $width, int $height)
-	{
-		$this->resource = \imagecreate($width, $height);
-	}
-
-	public function color(int $red, int $green, int $blue, int $alpha = null)
-	{
-		if ($alpha === null)
-		{
-			$color = \imagecolorallocate($this->resource, $red, $green, $blue);
-		}
-		else
-		{
-			$color = \imagecolorallocatealpha($this->resource, $red, $green, $blue, $alpha);
-		}
-
-		// The first time a color is set to the background
-		// After return the color identifier
-		if ($this->background === null)
-		{
-			return $this;
-		}
-
-		return $color;
-	}
-
-	public function string($font, $x, $y, $string, $color)
-	{
-		\imagestring($this->resource, $font, $x, $y, $string, $color);
-	}
-
-	public function getFont($filename)
-	{
-		return \imagepsloadfont($filename);
-	}
-	*/
 	public function save(string $filename = null, int $quality = null) : bool
 	{
 		$filename = $filename ?? $this->filename;
@@ -123,7 +85,7 @@ class Image
 				return \imagegif($this->resource, $filename);
 				break;
 			default:
-				throw new \Exception('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
 		}
 	}
 
@@ -149,7 +111,7 @@ class Image
 				\imagegif($this->resource, null);
 				break;
 			default:
-				throw new \Exception('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
 		}
 		return \ob_get_clean();
 	}
@@ -219,12 +181,12 @@ class Image
 				$direction = \IMG_FLIP_BOTH;
 				break;
 			default:
-				throw new \Exception('Invalid image flip direction "' . $direction . '"');
+				throw new \InvalidArgumentException('Invalid image flip direction "' . $direction . '"');
 				break;
 		}
 		$flip = \imageflip($this->resource, $direction);
 		if ($flip === false) {
-			throw new \Exception('Was not possible to flip.');
+			throw new \RuntimeException('Was not possible to flip.');
 		}
 		return $this;
 	}
@@ -248,7 +210,7 @@ class Image
 			'height' => $height,
 		]);
 		if ($crop === false) {
-			throw new \Exception('Was not possible to crop.');
+			throw new \RuntimeException('Was not possible to crop.');
 		}
 		$this->resource = $crop;
 		return $this;
@@ -266,7 +228,7 @@ class Image
 	{
 		$scale = \imagescale($this->resource, $width, $height);
 		if ($scale === false) {
-			throw new \Exception('Was not possible to scale.');
+			throw new \RuntimeException('Was not possible to scale.');
 		}
 		$this->resource = $scale;
 		return $this;
@@ -281,7 +243,7 @@ class Image
 	 */
 	public function rotate(float $angle)
 	{
-		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF])) {
+		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
 			\imagealphablending($this->resource, false);
 			\imagesavealpha($this->resource, true);
 			$background = \imagecolorallocatealpha($this->resource, 0, 0, 0, 127);
@@ -290,7 +252,7 @@ class Image
 		}
 		$rotate = \imagerotate($this->resource, -1 * $angle, $background);
 		if ($rotate === false) {
-			throw new \Exception('Was not possible to rotate.');
+			throw new \RuntimeException('Was not possible to rotate.');
 		}
 		$this->resource = $rotate;
 		return $this;
@@ -330,7 +292,7 @@ class Image
 			$this->getHeight()
 		);
 		if ($copied === false) {
-			throw new \Exception('Was not possible to flatten.');
+			throw new \RuntimeException('Was not possible to flatten.');
 		}
 		$this->resource = $image;
 		return $this;
@@ -348,7 +310,7 @@ class Image
 	{
 		$set = \imageresolution($this->resource, $horizontal, $vertical);
 		if ($set === false) {
-			throw new \Exception('Was not possible to set resolution.');
+			throw new \RuntimeException('Was not possible to set resolution.');
 		}
 		return $this;
 	}
@@ -367,7 +329,7 @@ class Image
 	{
 		$filtered = \imagefilter($this->resource, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new \Exception('Was not possible to filter.');
+			throw new \RuntimeException('Was not possible to filter.');
 		}
 		return $this;
 	}
@@ -391,8 +353,9 @@ class Image
 	 */
 	public function setResource($resource)
 	{
-		if (($type = \get_resource_type($resource)) !== 'gd') {
-			throw new \Exception('Image resource must be of type "gd". "' . $type . '" given.');
+		$type = \get_resource_type($resource);
+		if ($type !== 'gd') {
+			throw new \InvalidArgumentException('Image resource must be of type "gd". "' . $type . '" given.');
 		}
 		$this->resource = $resource;
 		return $this;
@@ -401,9 +364,9 @@ class Image
 	/**
 	 * Adds a watermark to the image.
 	 *
-	 * @param \Framework\Image\Image $watermark the image to use as watermark
-	 * @param int                    $x         horizontal position
-	 * @param int                    $y         vertical position
+	 * @param Image $watermark the image to use as watermark
+	 * @param int   $x         horizontal position
+	 * @param int   $y         vertical position
 	 *
 	 * @return $this
 	 */
@@ -426,7 +389,7 @@ class Image
 			$watermark->getHeight()
 		);
 		if ($copied === false) {
-			throw new \Exception('Was not possible to create watermark.');
+			throw new \RuntimeException('Was not possible to create watermark.');
 		}
 		return $this;
 	}
