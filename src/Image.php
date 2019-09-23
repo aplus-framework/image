@@ -34,6 +34,9 @@ class Image
 	 * Image constructor.
 	 *
 	 * @param string $filename path to the image file
+	 *
+	 * @throws \InvalidArgumentException for invalid file
+	 * @throws \RuntimeException         for unsuported image type of could not get image info
 	 */
 	public function __construct(string $filename)
 	{
@@ -77,6 +80,8 @@ class Image
 	 * @param int|null    $quality  The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
 	 *                              100 on JPEG, default is 75. Leave null to use the default.
 	 *
+	 * @throws \RuntimeException
+	 *
 	 * @return bool
 	 */
 	public function save(string $filename = null, int $quality = null) : bool
@@ -102,6 +107,8 @@ class Image
 	 *
 	 * @param int|null $quality The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
 	 *                          100 on JPEG, default is 75. Leave null to use the default.
+	 *
+	 * @throws \RuntimeException for image type not available
 	 *
 	 * @return false|string The image contents on success or FALSE on failure
 	 */
@@ -171,6 +178,9 @@ class Image
 	 *
 	 * @param string $direction Allowed values are: h or horizontal. v or vertical. b or both.
 	 *
+	 * @throws \InvalidArgumentException for invalid image flip direction
+	 * @throws \RuntimeException         for image could not to flip
+	 *
 	 * @return $this
 	 */
 	public function flip(string $direction = 'horizontal')
@@ -207,6 +217,8 @@ class Image
 	 * @param int $margin_left margin left in pixels
 	 * @param int $margin_top  margin top in pixels
 	 *
+	 * @throws \RuntimeException for image could not to crop
+	 *
 	 * @return $this
 	 */
 	public function crop(int $width, int $height, int $margin_left = 0, int $margin_top = 0)
@@ -230,6 +242,8 @@ class Image
 	 * @param int $width  width in pixels
 	 * @param int $height Height in pixels. Use -1 to use a proportional height based on the width.
 	 *
+	 * @throws \RuntimeException for image could not to scale
+	 *
 	 * @return $this
 	 */
 	public function scale(int $width, int $height = -1)
@@ -246,6 +260,8 @@ class Image
 	 * Rotates the image with a given angle.
 	 *
 	 * @param float $angle Rotation angle, in degrees. Clockwise direction.
+	 *
+	 * @throws \RuntimeException for image could not to rotate
 	 *
 	 * @return $this
 	 */
@@ -274,6 +290,8 @@ class Image
 	 * @param int $red
 	 * @param int $green
 	 * @param int $blue
+	 *
+	 * @throws \RuntimeException for image could not to flatten
 	 *
 	 * @return $this
 	 */
@@ -312,6 +330,8 @@ class Image
 	 * @param int $horizontal the horizontal resolution in DPI
 	 * @param int $vertical   the vertical resolution in DPI
 	 *
+	 * @throws \RuntimeException for image could not to set resolution
+	 *
 	 * @return $this
 	 */
 	public function setResolution(int $horizontal = 96, int $vertical = 96)
@@ -331,13 +351,15 @@ class Image
 	 *
 	 * @see https://secure.php.net/manual/en/function.imagefilter.php
 	 *
+	 * @throws \RuntimeException for image could not apply the filter
+	 *
 	 * @return $this
 	 */
 	public function filter(int $type, ...$arguments)
 	{
 		$filtered = \imagefilter($this->resource, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new \RuntimeException('Image could not to filter.');
+			throw new \RuntimeException('Image could apply the filter.');
 		}
 		return $this;
 	}
@@ -357,6 +379,8 @@ class Image
 	 *
 	 * @param resource $resource GD resource
 	 *
+	 * @throws \InvalidArgumentException for resource is not of gd type
+	 *
 	 * @return $this
 	 */
 	public function setResource($resource)
@@ -375,6 +399,8 @@ class Image
 	 * @param Image $watermark the image to use as watermark
 	 * @param int   $x         horizontal position
 	 * @param int   $y         vertical position
+	 *
+	 * @throws \RuntimeException for image could not to create watermark
 	 *
 	 * @return $this
 	 */
