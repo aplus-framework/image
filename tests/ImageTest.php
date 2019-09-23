@@ -24,6 +24,19 @@ class ImageTest extends TestCase
 		\unlink($filename);
 	}
 
+	public function testIsImage()
+	{
+		$this->assertTrue(
+			Image::isImage(__DIR__ . '/Support/tree.png')
+		);
+		$this->assertFalse(
+			Image::isImage(__FILE__)
+		);
+		$this->assertFalse(
+			Image::isImage('/tmp/unkown')
+		);
+	}
+
 	public function testHeight()
 	{
 		$this->assertEquals(920, $this->image->getHeight());

@@ -38,7 +38,7 @@ class Image
 	public function __construct(string $filename)
 	{
 		if ( ! \is_readable($filename)) {
-			throw new \InvalidArgumentException('File "' . $filename . '" does not exists or is not readable.');
+			throw new \InvalidArgumentException('File does not exists or is not readable: ' . $filename);
 		}
 		$this->filename = $filename;
 		$info = \getimagesize($this->filename);
@@ -46,9 +46,8 @@ class Image
 			throw new \RuntimeException('Could not get info of the given image filename');
 		}
 		if ( ! (\imagetypes() & $info[2])) {
-			throw new \RuntimeException('Unsupported image type.');
+			throw new \RuntimeException('Unsupported image type: ' . $info[2]);
 		}
-		//\var_dump($info);exit;
 		$this->type = $info[2];
 		$this->mime = $info['mime'];
 		switch ($this->type) {
@@ -62,7 +61,7 @@ class Image
 				$this->resource = \imagecreatefromgif($filename);
 				break;
 			default:
-				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type is not available: ' . $this->type);
 		}
 	}
 
@@ -71,6 +70,15 @@ class Image
 		$this->destroy();
 	}
 
+	/**
+	 * Save the Image to a given filename.
+	 *
+	 * @param string|null $filename Optional filename or null to use the original
+	 * @param int|null    $quality  The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
+	 *                              100 on JPEG, default is 75. Leave null to use the default.
+	 *
+	 * @return bool
+	 */
 	public function save(string $filename = null, int $quality = null) : bool
 	{
 		$filename = $filename ?? $this->filename;
@@ -85,7 +93,7 @@ class Image
 				return \imagegif($this->resource, $filename);
 				break;
 			default:
-				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type is not available: ' . $this->type);
 		}
 	}
 
@@ -95,7 +103,7 @@ class Image
 	 * @param int|null $quality The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
 	 *                          100 on JPEG, default is 75. Leave null to use the default.
 	 *
-	 * @return false|string TRUE on success or FALSE on failure
+	 * @return false|string The image contents on success or FALSE on failure
 	 */
 	public function render(int $quality = null)
 	{
@@ -108,10 +116,10 @@ class Image
 				\imagejpeg($this->resource, null, $quality ?? 75);
 				break;
 			case \IMAGETYPE_GIF:
-				\imagegif($this->resource, null);
+				\imagegif($this->resource);
 				break;
 			default:
-				throw new \RuntimeException('Image type "' . $this->type . '" is not available.');
+				throw new \RuntimeException('Image type is not available: ' . $this->type);
 		}
 		return \ob_get_clean();
 	}
@@ -181,12 +189,12 @@ class Image
 				$direction = \IMG_FLIP_BOTH;
 				break;
 			default:
-				throw new \InvalidArgumentException('Invalid image flip direction "' . $direction . '"');
+				throw new \InvalidArgumentException('Invalid image flip direction: ' . $direction);
 				break;
 		}
 		$flip = \imageflip($this->resource, $direction);
 		if ($flip === false) {
-			throw new \RuntimeException('Was not possible to flip.');
+			throw new \RuntimeException('Image could not to flip.');
 		}
 		return $this;
 	}
@@ -210,7 +218,7 @@ class Image
 			'height' => $height,
 		]);
 		if ($crop === false) {
-			throw new \RuntimeException('Was not possible to crop.');
+			throw new \RuntimeException('Image could not to crop.');
 		}
 		$this->resource = $crop;
 		return $this;
@@ -228,7 +236,7 @@ class Image
 	{
 		$scale = \imagescale($this->resource, $width, $height);
 		if ($scale === false) {
-			throw new \RuntimeException('Was not possible to scale.');
+			throw new \RuntimeException('Image could not to scale.');
 		}
 		$this->resource = $scale;
 		return $this;
@@ -252,7 +260,7 @@ class Image
 		}
 		$rotate = \imagerotate($this->resource, -1 * $angle, $background);
 		if ($rotate === false) {
-			throw new \RuntimeException('Was not possible to rotate.');
+			throw new \RuntimeException('Image could not to rotate.');
 		}
 		$this->resource = $rotate;
 		return $this;
@@ -292,7 +300,7 @@ class Image
 			$this->getHeight()
 		);
 		if ($copied === false) {
-			throw new \RuntimeException('Was not possible to flatten.');
+			throw new \RuntimeException('Image could not to flatten.');
 		}
 		$this->resource = $image;
 		return $this;
@@ -310,7 +318,7 @@ class Image
 	{
 		$set = \imageresolution($this->resource, $horizontal, $vertical);
 		if ($set === false) {
-			throw new \RuntimeException('Was not possible to set resolution.');
+			throw new \RuntimeException('Image could not to set resolution.');
 		}
 		return $this;
 	}
@@ -329,7 +337,7 @@ class Image
 	{
 		$filtered = \imagefilter($this->resource, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new \RuntimeException('Was not possible to filter.');
+			throw new \RuntimeException('Image could not to filter.');
 		}
 		return $this;
 	}
@@ -389,7 +397,7 @@ class Image
 			$watermark->getHeight()
 		);
 		if ($copied === false) {
-			throw new \RuntimeException('Was not possible to create watermark.');
+			throw new \RuntimeException('Image could not to create watermark.');
 		}
 		return $this;
 	}
@@ -445,6 +453,28 @@ class Image
 	{
 		if (\is_resource($this->resource)) {
 			return \imagedestroy($this->resource);
+		}
+		return true;
+	}
+
+	/**
+	 * Indicates if a given filename is an acceptable image.
+	 *
+	 * @param string $filename
+	 *
+	 * @return bool
+	 */
+	public static function isImage(string $filename) : bool
+	{
+		if ( ! \is_readable($filename)) {
+			return false;
+		}
+		$info = \getimagesize($filename);
+		if ($info === false) {
+			return false;
+		}
+		if ( ! (\imagetypes() & $info[2])) {
+			return false;
 		}
 		return true;
 	}
