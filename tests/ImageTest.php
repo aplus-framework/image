@@ -200,4 +200,12 @@ class ImageTest extends TestCase
 			$this->image->render()
 		);
 	}
+
+	public function testJson()
+	{
+		$this->assertStringStartsWith(
+			'"data:image\/png;base64,',
+			\json_encode($this->image)
+		);
+	}
 }

@@ -3,7 +3,7 @@
 /**
  * Class Image.
  */
-class Image
+class Image implements \JsonSerializable
 {
 	/**
 	 * Path to the image file.
@@ -481,6 +481,16 @@ class Image
 			return \imagedestroy($this->resource);
 		}
 		return true;
+	}
+
+	/**
+	 * @throws \RuntimeException
+	 *
+	 * @return string
+	 */
+	public function jsonSerialize()
+	{
+		return 'data:' . $this->getMime() . ';base64,' . \base64_encode($this->render());
 	}
 
 	/**
