@@ -208,4 +208,35 @@ class ImageTest extends TestCase
 			\json_encode($this->image)
 		);
 	}
+
+	public function testFileNotReadable()
+	{
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('File does not exists or is not readable: /tmp/foo');
+		new Image('/tmp/foo');
+	}
+
+	public function testUnsupportedType()
+	{
+		$file = __DIR__ . '/Support/tree.bmp';
+		$this->expectException(\RuntimeException::class);
+		$this->expectExceptionMessage('Image type is not available: 6');
+		new Image($file);
+	}
+
+	public function testJpgType()
+	{
+		$file = __DIR__ . '/Support/tree.jpg';
+		$image = new Image($file);
+		$this->assertTrue($image->save());
+		$image->render();
+	}
+
+	public function testGifType()
+	{
+		$file = __DIR__ . '/Support/tree.gif';
+		$image = new Image($file);
+		$this->assertTrue($image->save());
+		$image->render();
+	}
 }

@@ -46,7 +46,9 @@ class Image implements \JsonSerializable
 		$this->filename = $filename;
 		$info = \getimagesize($this->filename);
 		if ($info === false) {
-			throw new \RuntimeException('Could not get info of the given image filename');
+			throw new \RuntimeException(
+				'Could not get info of the given image filename: ' . $this->filename
+			);
 		}
 		if ( ! (\imagetypes() & $info[2])) {
 			throw new \RuntimeException('Unsupported image type: ' . $info[2]);
@@ -359,7 +361,7 @@ class Image implements \JsonSerializable
 	{
 		$filtered = \imagefilter($this->resource, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new \RuntimeException('Image could apply the filter.');
+			throw new \RuntimeException('Image could not apply the filter.');
 		}
 		return $this;
 	}
