@@ -5,10 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
 {
-	/**
-	 * @var Image
-	 */
-	protected $image;
+	protected Image $image;
 
 	public function setup() : void
 	{

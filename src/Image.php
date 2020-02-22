@@ -7,22 +7,16 @@ class Image implements \JsonSerializable
 {
 	/**
 	 * Path to the image file.
-	 *
-	 * @var string
 	 */
-	protected $filename;
+	protected string $filename;
 	/**
 	 * Image type. One of IMAGETYPE_* constants.
-	 *
-	 * @var int
 	 */
-	protected $type;
+	protected int $type;
 	/**
 	 * MIME type.
-	 *
-	 * @var string
 	 */
-	protected $mime;
+	protected string $mime;
 	/**
 	 * GD resource.
 	 *
