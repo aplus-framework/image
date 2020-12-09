@@ -1,5 +1,8 @@
 <?php namespace Framework\Image;
 
+use InvalidArgumentException;
+use RuntimeException;
+
 /**
  * Class Image.
  */
@@ -29,23 +32,23 @@ class Image implements \JsonSerializable
 	 *
 	 * @param string $filename path to the image file
 	 *
-	 * @throws \InvalidArgumentException for invalid file
-	 * @throws \RuntimeException         for unsuported image type of could not get image info
+	 * @throws InvalidArgumentException for invalid file
+	 * @throws RuntimeException         for unsuported image type of could not get image info
 	 */
 	public function __construct(string $filename)
 	{
 		if ( ! \is_readable($filename)) {
-			throw new \InvalidArgumentException('File does not exists or is not readable: ' . $filename);
+			throw new InvalidArgumentException('File does not exists or is not readable: ' . $filename);
 		}
 		$this->filename = $filename;
 		$info = \getimagesize($this->filename);
 		if ($info === false) {
-			throw new \RuntimeException(
+			throw new RuntimeException(
 				'Could not get info of the given image filename: ' . $this->filename
 			);
 		}
 		if ( ! (\imagetypes() & $info[2])) {
-			throw new \RuntimeException('Unsupported image type: ' . $info[2]);
+			throw new RuntimeException('Unsupported image type: ' . $info[2]);
 		}
 		$this->type = $info[2];
 		$this->mime = $info['mime'];
@@ -60,7 +63,7 @@ class Image implements \JsonSerializable
 				$this->resource = \imagecreatefromgif($filename);
 				break;
 			default:
-				throw new \RuntimeException('Image type is not available: ' . $this->type);
+				throw new RuntimeException('Image type is not available: ' . $this->type);
 		}
 	}
 
@@ -76,7 +79,7 @@ class Image implements \JsonSerializable
 	 * @param int|null    $quality  The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
 	 *                              100 on JPEG, default is 75. Leave null to use the default.
 	 *
-	 * @throws \RuntimeException
+	 * @throws RuntimeException
 	 *
 	 * @return bool
 	 */
@@ -86,15 +89,12 @@ class Image implements \JsonSerializable
 		switch ($this->type) {
 			case \IMAGETYPE_PNG:
 				return \imagepng($this->resource, $filename, $quality ?? 6);
-				break;
 			case \IMAGETYPE_JPEG:
 				return \imagejpeg($this->resource, $filename, $quality ?? 75);
-				break;
 			case \IMAGETYPE_GIF:
 				return \imagegif($this->resource, $filename);
-				break;
 			default:
-				throw new \RuntimeException('Image type is not available: ' . $this->type);
+				throw new RuntimeException('Image type is not available: ' . $this->type);
 		}
 	}
 
@@ -104,7 +104,7 @@ class Image implements \JsonSerializable
 	 * @param int|null $quality The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
 	 *                          100 on JPEG, default is 75. Leave null to use the default.
 	 *
-	 * @throws \RuntimeException for image type not available
+	 * @throws RuntimeException for image type not available
 	 *
 	 * @return false|string The image contents on success or FALSE on failure
 	 */
@@ -122,7 +122,7 @@ class Image implements \JsonSerializable
 				\imagegif($this->resource);
 				break;
 			default:
-				throw new \RuntimeException('Image type is not available: ' . $this->type);
+				throw new RuntimeException('Image type is not available: ' . $this->type);
 		}
 		return \ob_get_clean();
 	}
@@ -174,8 +174,8 @@ class Image implements \JsonSerializable
 	 *
 	 * @param string $direction Allowed values are: h or horizontal. v or vertical. b or both.
 	 *
-	 * @throws \InvalidArgumentException for invalid image flip direction
-	 * @throws \RuntimeException         for image could not to flip
+	 * @throws InvalidArgumentException for invalid image flip direction
+	 * @throws RuntimeException         for image could not to flip
 	 *
 	 * @return $this
 	 */
@@ -195,12 +195,11 @@ class Image implements \JsonSerializable
 				$direction = \IMG_FLIP_BOTH;
 				break;
 			default:
-				throw new \InvalidArgumentException('Invalid image flip direction: ' . $direction);
-				break;
+				throw new InvalidArgumentException('Invalid image flip direction: ' . $direction);
 		}
 		$flip = \imageflip($this->resource, $direction);
 		if ($flip === false) {
-			throw new \RuntimeException('Image could not to flip.');
+			throw new RuntimeException('Image could not to flip.');
 		}
 		return $this;
 	}
@@ -213,7 +212,7 @@ class Image implements \JsonSerializable
 	 * @param int $margin_left margin left in pixels
 	 * @param int $margin_top  margin top in pixels
 	 *
-	 * @throws \RuntimeException for image could not to crop
+	 * @throws RuntimeException for image could not to crop
 	 *
 	 * @return $this
 	 */
@@ -226,7 +225,7 @@ class Image implements \JsonSerializable
 			'height' => $height,
 		]);
 		if ($crop === false) {
-			throw new \RuntimeException('Image could not to crop.');
+			throw new RuntimeException('Image could not to crop.');
 		}
 		$this->resource = $crop;
 		return $this;
@@ -238,7 +237,7 @@ class Image implements \JsonSerializable
 	 * @param int $width  width in pixels
 	 * @param int $height Height in pixels. Use -1 to use a proportional height based on the width.
 	 *
-	 * @throws \RuntimeException for image could not to scale
+	 * @throws RuntimeException for image could not to scale
 	 *
 	 * @return $this
 	 */
@@ -246,7 +245,7 @@ class Image implements \JsonSerializable
 	{
 		$scale = \imagescale($this->resource, $width, $height);
 		if ($scale === false) {
-			throw new \RuntimeException('Image could not to scale.');
+			throw new RuntimeException('Image could not to scale.');
 		}
 		$this->resource = $scale;
 		return $this;
@@ -257,7 +256,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @param float $angle Rotation angle, in degrees. Clockwise direction.
 	 *
-	 * @throws \RuntimeException for image could not to rotate
+	 * @throws RuntimeException for image could not to rotate
 	 *
 	 * @return $this
 	 */
@@ -272,7 +271,7 @@ class Image implements \JsonSerializable
 		}
 		$rotate = \imagerotate($this->resource, -1 * $angle, $background);
 		if ($rotate === false) {
-			throw new \RuntimeException('Image could not to rotate.');
+			throw new RuntimeException('Image could not to rotate.');
 		}
 		$this->resource = $rotate;
 		return $this;
@@ -287,7 +286,7 @@ class Image implements \JsonSerializable
 	 * @param int $green
 	 * @param int $blue
 	 *
-	 * @throws \RuntimeException for image could not to flatten
+	 * @throws RuntimeException for image could not to flatten
 	 *
 	 * @return $this
 	 */
@@ -314,7 +313,7 @@ class Image implements \JsonSerializable
 			$this->getHeight()
 		);
 		if ($copied === false) {
-			throw new \RuntimeException('Image could not to flatten.');
+			throw new RuntimeException('Image could not to flatten.');
 		}
 		$this->resource = $image;
 		return $this;
@@ -326,7 +325,7 @@ class Image implements \JsonSerializable
 	 * @param int $horizontal the horizontal resolution in DPI
 	 * @param int $vertical   the vertical resolution in DPI
 	 *
-	 * @throws \RuntimeException for image could not to set resolution
+	 * @throws RuntimeException for image could not to set resolution
 	 *
 	 * @return $this
 	 */
@@ -334,7 +333,7 @@ class Image implements \JsonSerializable
 	{
 		$set = \imageresolution($this->resource, $horizontal, $vertical);
 		if ($set === false) {
-			throw new \RuntimeException('Image could not to set resolution.');
+			throw new RuntimeException('Image could not to set resolution.');
 		}
 		return $this;
 	}
@@ -347,7 +346,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @see https://secure.php.net/manual/en/function.imagefilter.php
 	 *
-	 * @throws \RuntimeException for image could not apply the filter
+	 * @throws RuntimeException for image could not apply the filter
 	 *
 	 * @return $this
 	 */
@@ -355,7 +354,7 @@ class Image implements \JsonSerializable
 	{
 		$filtered = \imagefilter($this->resource, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new \RuntimeException('Image could not apply the filter.');
+			throw new RuntimeException('Image could not apply the filter.');
 		}
 		return $this;
 	}
@@ -375,7 +374,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @param resource $resource GD resource
 	 *
-	 * @throws \InvalidArgumentException for resource is not of gd type
+	 * @throws InvalidArgumentException for resource is not of gd type
 	 *
 	 * @return $this
 	 */
@@ -383,7 +382,7 @@ class Image implements \JsonSerializable
 	{
 		$type = \get_resource_type($resource);
 		if ($type !== 'gd') {
-			throw new \InvalidArgumentException('Image resource must be of type "gd". "' . $type . '" given.');
+			throw new InvalidArgumentException('Image resource must be of type "gd". "' . $type . '" given.');
 		}
 		$this->resource = $resource;
 		return $this;
@@ -396,7 +395,7 @@ class Image implements \JsonSerializable
 	 * @param int   $x         horizontal position
 	 * @param int   $y         vertical position
 	 *
-	 * @throws \RuntimeException for image could not to create watermark
+	 * @throws RuntimeException for image could not to create watermark
 	 *
 	 * @return $this
 	 */
@@ -419,7 +418,7 @@ class Image implements \JsonSerializable
 			$watermark->getHeight()
 		);
 		if ($copied === false) {
-			throw new \RuntimeException('Image could not to create watermark.');
+			throw new RuntimeException('Image could not to create watermark.');
 		}
 		return $this;
 	}
@@ -480,7 +479,7 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * @throws \RuntimeException
+	 * @throws RuntimeException
 	 *
 	 * @return string
 	 */
