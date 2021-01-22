@@ -76,16 +76,16 @@ class ImageTest extends TestCase
 		$this->assertTrue($this->image->destroy());
 	}
 
-	public function testResource()
+	public function testInstance()
 	{
-		$this->assertEquals('gd', \get_resource_type($this->image->getResource()));
-		$resource = \imagecreatefrompng(__DIR__ . '/Support/tree.png');
-		$this->assertNotEquals($resource, $this->image->getResource());
-		$this->image->setResource($resource);
-		$this->assertEquals($resource, $this->image->getResource());
+		$this->assertInstanceOf(\GdImage::class, $this->image->getInstance());
+		$instance = \imagecreatefrompng(__DIR__ . '/Support/tree.png');
+		$this->assertEquals($instance, $this->image->getInstance());
+		$this->image->setInstance($instance);
+		$this->assertEquals($instance, $this->image->getInstance());
 		$this->expectException(\Exception::class);
-		$resource = \fopen(__FILE__, 'rb');
-		$this->image->setResource($resource);
+		$instance = \fopen(__FILE__, 'rb');
+		$this->image->setInstance($instance);
 	}
 
 	public function testFileIsNotImage()
