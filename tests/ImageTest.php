@@ -47,7 +47,6 @@ class ImageTest extends TestCase
 	public function testExtension()
 	{
 		$this->assertEquals('.png', $this->image->getExtension());
-		$this->assertEquals('png', $this->image->getExtension(false));
 	}
 
 	public function testMime()

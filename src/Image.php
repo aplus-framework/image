@@ -1,5 +1,6 @@
 <?php namespace Framework\Image;
 
+use GdImage;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -23,7 +24,7 @@ class Image implements \JsonSerializable
 	/**
 	 * GD instance.
 	 *
-	 * @var \GdImage
+	 * @var GdImage
 	 */
 	protected $instance;
 
@@ -33,7 +34,7 @@ class Image implements \JsonSerializable
 	 * @param string $filename path to the image file
 	 *
 	 * @throws InvalidArgumentException for invalid file
-	 * @throws RuntimeException         for unsuported image type of could not get image info
+	 * @throws RuntimeException         for unsupported image type of could not get image info
 	 */
 	public function __construct(string $filename)
 	{
@@ -52,19 +53,12 @@ class Image implements \JsonSerializable
 		}
 		$this->type = $info[2];
 		$this->mime = $info['mime'];
-		switch ($this->type) {
-			case \IMAGETYPE_PNG:
-				$this->instance = \imagecreatefrompng($filename);
-				break;
-			case \IMAGETYPE_JPEG:
-				$this->instance = \imagecreatefromjpeg($filename);
-				break;
-			case \IMAGETYPE_GIF:
-				$this->instance = \imagecreatefromgif($filename);
-				break;
-			default:
-				throw new RuntimeException('Image type is not available: ' . $this->type);
-		}
+		$this->instance = match ($this->type) {
+			\IMAGETYPE_PNG => \imagecreatefrompng($filename),
+			\IMAGETYPE_JPEG => \imagecreatefromjpeg($filename),
+			\IMAGETYPE_GIF => \imagecreatefromgif($filename),
+			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+		};
 	}
 
 	public function __destruct()
@@ -86,16 +80,12 @@ class Image implements \JsonSerializable
 	public function save(string $filename = null, int $quality = null) : bool
 	{
 		$filename = $filename ?? $this->filename;
-		switch ($this->type) {
-			case \IMAGETYPE_PNG:
-				return \imagepng($this->instance, $filename, $quality ?? 6);
-			case \IMAGETYPE_JPEG:
-				return \imagejpeg($this->instance, $filename, $quality ?? 75);
-			case \IMAGETYPE_GIF:
-				return \imagegif($this->instance, $filename);
-			default:
-				throw new RuntimeException('Image type is not available: ' . $this->type);
-		}
+		return match ($this->type) {
+			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $quality ?? 6),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $quality ?? 75),
+			\IMAGETYPE_GIF => \imagegif($this->instance, $filename),
+			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+		};
 	}
 
 	/**
@@ -150,13 +140,12 @@ class Image implements \JsonSerializable
 	/**
 	 * Get file extension for image type.
 	 *
-	 * @param bool $include_dot whether to prepend a dot to the extension or not
-	 *
-	 * @return string a string with the extension corresponding to the given image type
+	 * @return false|string a string with the extension corresponding to the given image type or
+	 *                      false on fail
 	 */
-	public function getExtension(bool $include_dot = true) : string
+	public function getExtension() : string | false
 	{
-		return \image_type_to_extension($this->type, $include_dot);
+		return \image_type_to_extension($this->type);
 	}
 
 	/**
@@ -181,22 +170,12 @@ class Image implements \JsonSerializable
 	 */
 	public function flip(string $direction = 'horizontal')
 	{
-		switch ($direction) {
-			case 'h':
-			case 'horizontal':
-				$direction = \IMG_FLIP_HORIZONTAL;
-				break;
-			case 'v':
-			case 'vertical':
-				$direction = \IMG_FLIP_VERTICAL;
-				break;
-			case 'b':
-			case 'both':
-				$direction = \IMG_FLIP_BOTH;
-				break;
-			default:
-				throw new InvalidArgumentException('Invalid image flip direction: ' . $direction);
-		}
+		$direction = match ($direction) {
+			'h', 'horizontal' => \IMG_FLIP_HORIZONTAL,
+			'v', 'vertical' => \IMG_FLIP_VERTICAL,
+			'b', 'both' => \IMG_FLIP_BOTH,
+			default => throw new InvalidArgumentException('Invalid image flip direction: ' . $direction),
+		};
 		$flip = \imageflip($this->instance, $direction);
 		if ($flip === false) {
 			throw new RuntimeException('Image could not to flip.');
@@ -362,7 +341,7 @@ class Image implements \JsonSerializable
 	/**
 	 * Gets the image GD instance.
 	 *
-	 * @return \GdImage GD instance
+	 * @return GdImage GD instance
 	 */
 	public function getInstance()
 	{
@@ -372,7 +351,7 @@ class Image implements \JsonSerializable
 	/**
 	 * Sets the image GD instance.
 	 *
-	 * @param \GdImage $instance GD instance
+	 * @param GdImage $instance GD instance
 	 *
 	 * @throws InvalidArgumentException for instance is not of gd type
 	 *
@@ -380,7 +359,7 @@ class Image implements \JsonSerializable
 	 */
 	public function setInstance($instance)
 	{
-		if ( ! $instance instanceof \GdImage) {
+		if ( ! $instance instanceof GdImage) {
 			$type = \gettype($instance);
 			throw new InvalidArgumentException('Image instance must be of type "GdImage". "' . $type . '" given.');
 		}
@@ -472,7 +451,7 @@ class Image implements \JsonSerializable
 	 */
 	public function destroy() : bool
 	{
-		if ($this->instance instanceof \GdImage) {
+		if ($this->instance instanceof GdImage) {
 			return \imagedestroy($this->instance);
 		}
 		return true;
@@ -483,7 +462,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @return string
 	 */
-	public function jsonSerialize()
+	public function jsonSerialize() : string
 	{
 		return 'data:' . $this->getMime() . ';base64,' . \base64_encode($this->render());
 	}
