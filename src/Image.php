@@ -178,7 +178,7 @@ class Image implements \JsonSerializable
 		};
 		$flip = \imageflip($this->instance, $direction);
 		if ($flip === false) {
-			throw new RuntimeException('Image could not to flip.');
+			throw new RuntimeException('Image could not to flip');
 		}
 		return $this;
 	}
@@ -204,7 +204,7 @@ class Image implements \JsonSerializable
 			'height' => $height,
 		]);
 		if ($crop === false) {
-			throw new RuntimeException('Image could not to crop.');
+			throw new RuntimeException('Image could not to crop');
 		}
 		$this->instance = $crop;
 		return $this;
@@ -224,7 +224,7 @@ class Image implements \JsonSerializable
 	{
 		$scale = \imagescale($this->instance, $width, $height);
 		if ($scale === false) {
-			throw new RuntimeException('Image could not to scale.');
+			throw new RuntimeException('Image could not to scale');
 		}
 		$this->instance = $scale;
 		return $this;
@@ -250,7 +250,7 @@ class Image implements \JsonSerializable
 		}
 		$rotate = \imagerotate($this->instance, -1 * $angle, $background);
 		if ($rotate === false) {
-			throw new RuntimeException('Image could not to rotate.');
+			throw new RuntimeException('Image could not to rotate');
 		}
 		$this->instance = $rotate;
 		return $this;
@@ -292,7 +292,7 @@ class Image implements \JsonSerializable
 			$this->getHeight()
 		);
 		if ($copied === false) {
-			throw new RuntimeException('Image could not to flatten.');
+			throw new RuntimeException('Image could not to flatten');
 		}
 		$this->instance = $image;
 		return $this;
@@ -312,7 +312,7 @@ class Image implements \JsonSerializable
 	{
 		$set = \imageresolution($this->instance, $horizontal, $vertical);
 		if ($set === false) {
-			throw new RuntimeException('Image could not to set resolution.');
+			throw new RuntimeException('Image could not to set resolution');
 		}
 		return $this;
 	}
@@ -333,7 +333,7 @@ class Image implements \JsonSerializable
 	{
 		$filtered = \imagefilter($this->instance, $type, ...$arguments);
 		if ($filtered === false) {
-			throw new RuntimeException('Image could not apply the filter.');
+			throw new RuntimeException('Image could not apply the filter');
 		}
 		return $this;
 	}
@@ -361,7 +361,7 @@ class Image implements \JsonSerializable
 	{
 		if ( ! $instance instanceof GdImage) {
 			$type = \gettype($instance);
-			throw new InvalidArgumentException('Image instance must be of type "GdImage". "' . $type . '" given.');
+			throw new InvalidArgumentException('Image instance must be of type "GdImage". "' . $type . '" given');
 		}
 		$this->instance = $instance;
 		return $this;
@@ -397,7 +397,7 @@ class Image implements \JsonSerializable
 			$watermark->getHeight()
 		);
 		if ($copied === false) {
-			throw new RuntimeException('Image could not to create watermark.');
+			throw new RuntimeException('Image could not to create watermark');
 		}
 		return $this;
 	}
