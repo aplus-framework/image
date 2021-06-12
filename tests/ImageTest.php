@@ -3,7 +3,7 @@
 use Framework\Image\Image;
 use PHPUnit\Framework\TestCase;
 
-class ImageTest extends TestCase
+final class ImageTest extends TestCase
 {
 	protected Image $image;
 
@@ -12,56 +12,56 @@ class ImageTest extends TestCase
 		$this->image = new Image(__DIR__ . '/Support/tree.png');
 	}
 
-	public function testSave()
+	public function testSave() : void
 	{
 		$filename = '/tmp/--image.png';
-		$this->assertFalse(\is_file($filename));
+		self::assertFalse(\is_file($filename));
 		$this->image->save($filename);
-		$this->assertTrue(\is_file($filename));
+		self::assertTrue(\is_file($filename));
 		\unlink($filename);
 	}
 
-	public function testIsImage()
+	public function testIsImage() : void
 	{
-		$this->assertTrue(
+		self::assertTrue(
 			Image::isImage(__DIR__ . '/Support/tree.png')
 		);
-		$this->assertFalse(
+		self::assertFalse(
 			Image::isImage(__FILE__)
 		);
-		$this->assertFalse(
+		self::assertFalse(
 			Image::isImage('/tmp/unkown')
 		);
 	}
 
-	public function testHeight()
+	public function testHeight() : void
 	{
-		$this->assertEquals(920, $this->image->getHeight());
+		self::assertSame(920, $this->image->getHeight());
 	}
 
-	public function testWidth()
+	public function testWidth() : void
 	{
-		$this->assertEquals(700, $this->image->getWidth());
+		self::assertSame(700, $this->image->getWidth());
 	}
 
-	public function testExtension()
+	public function testExtension() : void
 	{
-		$this->assertEquals('.png', $this->image->getExtension());
+		self::assertSame('.png', $this->image->getExtension());
 	}
 
-	public function testMime()
+	public function testMime() : void
 	{
-		$this->assertEquals('image/png', $this->image->getMime());
+		self::assertSame('image/png', $this->image->getMime());
 	}
 
-	public function testResolution()
+	public function testResolution() : void
 	{
-		$this->assertEquals([
+		self::assertSame([
 			'horizontal' => 300,
 			'vertical' => 300,
 		], $this->image->getResolution());
 		$this->image->setResolution();
-		$this->assertEquals([
+		self::assertSame([
 			'horizontal' => 96,
 			'vertical' => 96,
 		], $this->image->getResolution());
@@ -69,150 +69,150 @@ class ImageTest extends TestCase
 		//$this->image->setResolution(0);
 	}
 
-	public function testDestroy()
+	public function testDestroy() : void
 	{
-		$this->assertTrue($this->image->destroy());
-		$this->assertTrue($this->image->destroy());
+		self::assertTrue($this->image->destroy());
+		self::assertTrue($this->image->destroy());
 	}
 
-	public function testInstance()
+	public function testInstance() : void
 	{
-		$this->assertInstanceOf(\GdImage::class, $this->image->getInstance());
+		self::assertInstanceOf(\GdImage::class, $this->image->getInstance());
 		$instance = \imagecreatefrompng(__DIR__ . '/Support/tree.png');
-		$this->assertEquals($instance, $this->image->getInstance());
+		self::assertNotSame($instance, $this->image->getInstance());
 		$this->image->setInstance($instance);
-		$this->assertEquals($instance, $this->image->getInstance());
+		self::assertSame($instance, $this->image->getInstance());
 		$this->expectException(\Exception::class);
 		$instance = \fopen(__FILE__, 'rb');
 		$this->image->setInstance($instance);
 	}
 
-	public function testFileIsNotImage()
+	public function testFileIsNotImage() : void
 	{
 		$this->expectException(\RuntimeException::class);
 		new Image(__FILE__);
 	}
 
-	public function testOpacity()
+	public function testOpacity() : void
 	{
 		$this->image->opacity(60);
 		//\file_put_contents(__DIR__ . '/Support/tree-opacity.png', $this->image->render());
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-opacity.png',
 			$this->image->render()
 		);
 	}
 
-	public function testOpacityGreatLevel()
+	public function testOpacityGreatLevel() : void
 	{
 		$this->image->opacity(120);
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-opacity-g.png',
 			$this->image->render()
 		);
 	}
 
-	public function testScale()
+	public function testScale() : void
 	{
 		$this->image->scale(80, 80);
 		\file_put_contents(__DIR__ . '/Support/tree-scale.png', $this->image->render());
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-scale.png',
 			$this->image->render()
 		);
 	}
 
-	public function testRotate()
+	public function testRotate() : void
 	{
 		$this->image->rotate(45);
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-rotate.png',
 			$this->image->render()
 		);
 	}
 
-	public function testFlipHorizontal()
+	public function testFlipHorizontal() : void
 	{
 		$this->image->flip();
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-flip-h.png',
 			$this->image->render()
 		);
 	}
 
-	public function testFlipVertical()
+	public function testFlipVertical() : void
 	{
 		$this->image->flip('v');
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-flip-v.png',
 			$this->image->render()
 		);
 	}
 
-	public function testFlipBoth()
+	public function testFlipBoth() : void
 	{
 		$this->image->flip('b');
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-flip-b.png',
 			$this->image->render()
 		);
 	}
 
-	public function testCrop()
+	public function testCrop() : void
 	{
 		$this->image->crop(200, 200, 100, 100);
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-crop.png',
 			$this->image->render()
 		);
 	}
 
-	public function testFilter()
+	public function testFilter() : void
 	{
 		$this->image->filter(\IMG_FILTER_NEGATE);
 		//\file_put_contents(__DIR__ . '/Support/tree-filter.png', $this->image->render());
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-filter.png',
 			$this->image->render()
 		);
 	}
 
-	public function testFlaten()
+	public function testFlaten() : void
 	{
 		$this->image->flatten(128, 0, 128);
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-flaten.png',
 			$this->image->render()
 		);
 	}
 
-	public function testWatermark()
+	public function testWatermark() : void
 	{
 		$watermark = new Image(__DIR__ . '/Support/tree.png');
 		$watermark->scale(100);
 		$this->image->watermark($watermark, -10, -10);
-		$this->assertStringEqualsFile(
+		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-watermark.png',
 			$this->image->render()
 		);
 	}
 
-	public function testJson()
+	public function testJson() : void
 	{
-		$this->assertStringStartsWith(
+		self::assertStringStartsWith(
 			'"data:image\/png;base64,',
 			\json_encode($this->image)
 		);
 	}
 
-	public function testFileNotReadable()
+	public function testFileNotReadable() : void
 	{
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('File does not exists or is not readable: /tmp/foo');
 		new Image('/tmp/foo');
 	}
 
-	public function testUnsupportedType()
+	public function testUnsupportedType() : void
 	{
 		$file = __DIR__ . '/Support/tree.bmp';
 		$this->expectException(\RuntimeException::class);
@@ -220,19 +220,19 @@ class ImageTest extends TestCase
 		new Image($file);
 	}
 
-	public function testJpgType()
+	public function testJpgType() : void
 	{
 		$file = __DIR__ . '/Support/tree.jpg';
 		$image = new Image($file);
-		$this->assertTrue($image->save());
+		self::assertTrue($image->save());
 		$image->render();
 	}
 
-	public function testGifType()
+	public function testGifType() : void
 	{
 		$file = __DIR__ . '/Support/tree.gif';
 		$image = new Image($file);
-		$this->assertTrue($image->save());
+		self::assertTrue($image->save());
 		$image->render();
 	}
 }
