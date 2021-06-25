@@ -31,10 +31,10 @@ class Image implements \JsonSerializable
 	/**
 	 * Image constructor.
 	 *
-	 * @param string $filename path to the image file
+	 * @param string $filename Path to the image file
 	 *
 	 * @throws InvalidArgumentException for invalid file
-	 * @throws RuntimeException         for unsupported image type of could not get image info
+	 * @throws RuntimeException for unsupported image type of could not get image info
 	 */
 	public function __construct(string $filename)
 	{
@@ -70,10 +70,11 @@ class Image implements \JsonSerializable
 	 * Save the Image to a given filename.
 	 *
 	 * @param string|null $filename Optional filename or null to use the original
-	 * @param int|null    $quality  The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
-	 *                              100 on JPEG, default is 75. Leave null to use the default.
+	 * @param int|null $quality The quality/compression level.
+	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
+	 * Leave null to use the default.
 	 *
-	 * @throws RuntimeException
+	 * @throws RuntimeException for image type not available
 	 *
 	 * @return bool
 	 */
@@ -91,8 +92,9 @@ class Image implements \JsonSerializable
 	/**
 	 * Renders the image output.
 	 *
-	 * @param int|null $quality The quality/compression level. 0 to 9 on PNG, default is 6. 0 to
-	 *                          100 on JPEG, default is 75. Leave null to use the default.
+	 * @param int|null $quality The quality/compression level.
+	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
+	 * Leave null to use the default.
 	 *
 	 * @throws RuntimeException for image type not available
 	 *
@@ -140,8 +142,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Get file extension for image type.
 	 *
-	 * @return false|string a string with the extension corresponding to the given image type or
-	 *                      false on fail
+	 * @return false|string a string with the extension corresponding to the
+	 * given image type or false on fail
 	 */
 	public function getExtension() : string | false
 	{
@@ -164,7 +166,7 @@ class Image implements \JsonSerializable
 	 * @param string $direction Allowed values are: h or horizontal. v or vertical. b or both.
 	 *
 	 * @throws InvalidArgumentException for invalid image flip direction
-	 * @throws RuntimeException         for image could not to flip
+	 * @throws RuntimeException for image could not to flip
 	 *
 	 * @return $this
 	 */
@@ -186,10 +188,10 @@ class Image implements \JsonSerializable
 	/**
 	 * Crops the image.
 	 *
-	 * @param int $width       width in pixels
-	 * @param int $height      height in pixels
-	 * @param int $margin_left margin left in pixels
-	 * @param int $margin_top  margin top in pixels
+	 * @param int $width Width in pixels
+	 * @param int $height Height in pixels
+	 * @param int $margin_left Margin left in pixels
+	 * @param int $margin_top Margin top in pixels
 	 *
 	 * @throws RuntimeException for image could not to crop
 	 *
@@ -213,8 +215,9 @@ class Image implements \JsonSerializable
 	/**
 	 * Scales the image.
 	 *
-	 * @param int $width  width in pixels
-	 * @param int $height Height in pixels. Use -1 to use a proportional height based on the width.
+	 * @param int $width Width in pixels
+	 * @param int $height Height in pixels. Use -1 to use a proportional height
+	 * based on the width.
 	 *
 	 * @throws RuntimeException for image could not to scale
 	 *
@@ -301,8 +304,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Sets the image resolution.
 	 *
-	 * @param int $horizontal the horizontal resolution in DPI
-	 * @param int $vertical   the vertical resolution in DPI
+	 * @param int $horizontal The horizontal resolution in DPI
+	 * @param int $vertical The vertical resolution in DPI
 	 *
 	 * @throws RuntimeException for image could not to set resolution
 	 *
@@ -320,8 +323,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Applies a filter to the image.
 	 *
-	 * @param int   $type         IMG_FILTER_* constants
-	 * @param mixed ...$arguments Arguments for the filter type.
+	 * @param int $type IMG_FILTER_* constants
+	 * @param mixed ...$arguments Arguments for the filter type
 	 *
 	 * @see https://secure.php.net/manual/en/function.imagefilter.php
 	 *
@@ -370,9 +373,9 @@ class Image implements \JsonSerializable
 	/**
 	 * Adds a watermark to the image.
 	 *
-	 * @param Image $watermark the image to use as watermark
-	 * @param int   $x         horizontal position
-	 * @param int   $y         vertical position
+	 * @param Image $watermark The image to use as watermark
+	 * @param int $x Horizontal position
+	 * @param int $y Vertical position
 	 *
 	 * @throws RuntimeException for image could not to create watermark
 	 *
@@ -433,7 +436,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Gets the image resolution.
 	 *
-	 * @return array array containing two keys, horizontal and vertical, with integers
+	 * @return array Returns an array containing two keys, horizontal and
+	 * vertical, with integers as values
 	 */
 	public function getResolution() : array
 	{
@@ -458,7 +462,7 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * @throws RuntimeException
+	 * @throws RuntimeException for image cannot render because type not available
 	 *
 	 * @return string
 	 */
