@@ -508,6 +508,20 @@ class Image implements \JsonSerializable
 	 */
 	public function jsonSerialize() : string
 	{
+		return $this->getDataURI();
+	}
+
+	/**
+	 * Allow embed the image contents in a document.
+	 *
+	 * @throws RuntimeException for image cannot render because type not available
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	 *
+	 * @return string The image data URI
+	 */
+	public function getDataURI() : string
+	{
 		return 'data:' . $this->getMime() . ';base64,' . \base64_encode($this->render());
 	}
 
