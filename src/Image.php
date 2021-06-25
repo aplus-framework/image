@@ -111,17 +111,34 @@ class Image implements \JsonSerializable
 	public function render(int $quality = null) : string
 	{
 		\ob_start();
-		$status = match ($this->type) {
-			\IMAGETYPE_PNG => \imagepng($this->instance, null, $quality ?? 6),
-			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $quality ?? 75),
-			\IMAGETYPE_GIF => \imagegif($this->instance),
-			default => throw new RuntimeException('Image type is not available: ' . $this->type),
-		};
+		$status = $this->send($quality);
 		$contents = \ob_get_clean();
 		if ($status === false || $contents === false) {
 			throw new RuntimeException('Image could not be rendered');
 		}
 		return $contents;
+	}
+
+	/**
+	 * Output the image to the browser.
+	 *
+	 * @param int|null $quality The quality/compression level.
+	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
+	 * Leave null to use the default.
+	 *
+	 * @throws RuntimeException for image type not available
+	 *
+	 * @return bool
+	 */
+	public function send(int $quality = null) : bool
+	{
+		// @phpstan-ignore-next-line
+		return match ($this->type) {
+			\IMAGETYPE_PNG => \imagepng($this->instance, null, $quality ?? 6),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $quality ?? 75),
+			\IMAGETYPE_GIF => \imagegif($this->instance),
+			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+		};
 	}
 
 	/**
