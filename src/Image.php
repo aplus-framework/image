@@ -402,8 +402,8 @@ class Image implements \JsonSerializable
 	 * Adds a watermark to the image.
 	 *
 	 * @param Image $watermark The image to use as watermark
-	 * @param int $marginLeft Horizontal position
-	 * @param int $marginTop Vertical position
+	 * @param int $horizontalPosition Horizontal position
+	 * @param int $verticalPosition Vertical position
 	 *
 	 * @throws RuntimeException for image could not to create watermark
 	 *
@@ -411,22 +411,22 @@ class Image implements \JsonSerializable
 	 */
 	public function watermark(
 		Image $watermark,
-		int $marginLeft = 0,
-		int $marginTop = 0
+		int $horizontalPosition = 0,
+		int $verticalPosition = 0
 	) {
-		if ($marginLeft < 0) {
-			$marginLeft = $this->getWidth()
-				- (-1 * $marginLeft + $watermark->getWidth());
+		if ($horizontalPosition < 0) {
+			$horizontalPosition = $this->getWidth()
+				- (-1 * $horizontalPosition + $watermark->getWidth());
 		}
-		if ($marginTop < 0) {
-			$marginTop = $this->getHeight()
-				- (-1 * $marginTop + $watermark->getHeight());
+		if ($verticalPosition < 0) {
+			$verticalPosition = $this->getHeight()
+				- (-1 * $verticalPosition + $watermark->getHeight());
 		}
 		$copied = \imagecopy(
 			$this->instance,
 			$watermark->getInstance(),
-			$marginLeft,
-			$marginTop,
+			$horizontalPosition,
+			$verticalPosition,
 			0,
 			0,
 			$watermark->getWidth(),
