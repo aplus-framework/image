@@ -2,6 +2,7 @@
 
 use GdImage;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\ArrayShape;
 use RuntimeException;
 
 /**
@@ -438,6 +439,7 @@ class Image implements \JsonSerializable
 	 * @return array<string,int> Returns an array containing two keys, horizontal and
 	 * vertical, with integers as values
 	 */
+	#[ArrayShape(['horizontal' => 'int', 'vertical' => 'int'])]
 	public function getResolution() : array
 	{
 		$resolution = \imageresolution($this->instance);
