@@ -39,10 +39,11 @@ class Image implements \JsonSerializable
 	 */
 	public function __construct(string $filename)
 	{
-		if ( ! \is_readable($filename)) {
+		$realpath = \realpath($filename);
+		if ($realpath === false || ! \is_file($realpath) || ! \is_readable($realpath)) {
 			throw new InvalidArgumentException('File does not exists or is not readable: ' . $filename);
 		}
-		$this->filename = $filename;
+		$this->filename = $realpath;
 		$info = \getimagesize($this->filename);
 		if ($info === false) {
 			throw new RuntimeException(
@@ -55,9 +56,9 @@ class Image implements \JsonSerializable
 		$this->type = $info[2];
 		$this->mime = $info['mime'];
 		$instance = match ($this->type) {
-			\IMAGETYPE_PNG => \imagecreatefrompng($filename),
-			\IMAGETYPE_JPEG => \imagecreatefromjpeg($filename),
-			\IMAGETYPE_GIF => \imagecreatefromgif($filename),
+			\IMAGETYPE_PNG => \imagecreatefrompng($this->filename),
+			\IMAGETYPE_JPEG => \imagecreatefromjpeg($this->filename),
+			\IMAGETYPE_GIF => \imagecreatefromgif($this->filename),
 			default => throw new RuntimeException('Image type is not available: ' . $this->type),
 		};
 		if ( ! $instance instanceof GdImage) {
