@@ -30,7 +30,7 @@ final class ImageTest extends TestCase
 			Image::isImage(__FILE__)
 		);
 		self::assertFalse(
-			Image::isImage('/tmp/unkown')
+			Image::isImage('/tmp/unknown')
 		);
 	}
 
@@ -177,11 +177,11 @@ final class ImageTest extends TestCase
 		);
 	}
 
-	public function testFlaten() : void
+	public function testFlatten() : void
 	{
 		$this->image->flatten(128, 0, 128);
 		self::assertStringEqualsFile(
-			__DIR__ . '/Support/tree-flaten.png',
+			__DIR__ . '/Support/tree-flatten.png',
 			$this->image->render()
 		);
 	}

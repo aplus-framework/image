@@ -133,6 +133,9 @@ class Image implements \JsonSerializable
 	 */
 	public function send(int $quality = null) : bool
 	{
+		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
+			\imagesavealpha($this->instance, true);
+		}
 		// @phpstan-ignore-next-line
 		return match ($this->type) {
 			\IMAGETYPE_PNG => \imagepng($this->instance, null, $quality ?? 6),
