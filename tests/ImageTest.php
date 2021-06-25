@@ -80,7 +80,7 @@ final class ImageTest extends TestCase
 		self::assertInstanceOf(\GdImage::class, $this->image->getInstance());
 		$instance = \imagecreatefrompng(__DIR__ . '/Support/tree.png');
 		self::assertNotSame($instance, $this->image->getInstance());
-		$this->image->setInstance($instance);
+		$this->image->setInstance($instance); // @phpstan-ignore-line
 		self::assertSame($instance, $this->image->getInstance());
 		$this->expectException(\TypeError::class);
 		$instance = \fopen(__FILE__, 'rb');
@@ -201,7 +201,7 @@ final class ImageTest extends TestCase
 	{
 		self::assertStringStartsWith(
 			'"data:image\/png;base64,',
-			\json_encode($this->image)
+			\json_encode($this->image) ?: ''
 		);
 	}
 

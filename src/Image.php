@@ -27,7 +27,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @var GdImage
 	 */
-	protected $instance;
+	protected GdImage $instance;
 
 	/**
 	 * Image constructor.
@@ -54,12 +54,18 @@ class Image implements \JsonSerializable
 		}
 		$this->type = $info[2];
 		$this->mime = $info['mime'];
-		$this->instance = match ($this->type) {
+		$instance = match ($this->type) {
 			\IMAGETYPE_PNG => \imagecreatefrompng($filename),
 			\IMAGETYPE_JPEG => \imagecreatefromjpeg($filename),
 			\IMAGETYPE_GIF => \imagecreatefromgif($filename),
 			default => throw new RuntimeException('Image type is not available: ' . $this->type),
 		};
+		if ( ! $instance instanceof GdImage) {
+			throw new RuntimeException(
+				"Image of type '{$this->type}' does not returned a GdImage instance"
+			);
+		}
+		$this->instance = $instance;
 	}
 
 	public function __destruct()
@@ -97,27 +103,25 @@ class Image implements \JsonSerializable
 	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
 	 * Leave null to use the default.
 	 *
-	 * @throws RuntimeException for image type not available
+	 * @throws RuntimeException for image type not available or image could not
+	 * be rendered
 	 *
-	 * @return false|string The image contents on success or FALSE on failure
+	 * @return string The image contents
 	 */
-	public function render(int $quality = null)
+	public function render(int $quality = null) : string
 	{
 		\ob_start();
-		switch ($this->type) {
-			case \IMAGETYPE_PNG:
-				\imagepng($this->instance, null, $quality ?? 6);
-				break;
-			case \IMAGETYPE_JPEG:
-				\imagejpeg($this->instance, null, $quality ?? 75);
-				break;
-			case \IMAGETYPE_GIF:
-				\imagegif($this->instance);
-				break;
-			default:
-				throw new RuntimeException('Image type is not available: ' . $this->type);
+		$status = match ($this->type) {
+			\IMAGETYPE_PNG => \imagepng($this->instance, null, $quality ?? 6),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $quality ?? 75),
+			\IMAGETYPE_GIF => \imagegif($this->instance),
+			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+		};
+		$contents = \ob_get_clean();
+		if ($status === false || $contents === false) {
+			throw new RuntimeException('Image could not be rendered');
 		}
-		return \ob_get_clean();
+		return $contents;
 	}
 
 	/**
@@ -239,7 +243,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @param float $angle Rotation angle, in degrees. Clockwise direction.
 	 *
-	 * @throws RuntimeException for image could not to rotate
+	 * @throws RuntimeException for image could not allocate a color or could not rotate
 	 *
 	 * @return $this
 	 */
@@ -251,6 +255,9 @@ class Image implements \JsonSerializable
 			$background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
 		} else {
 			$background = \imagecolorallocate($this->instance, 255, 255, 255);
+		}
+		if ($background === false) {
+			throw new RuntimeException('Image could not allocate a color');
 		}
 		$rotate = \imagerotate($this->instance, -1 * $angle, $background);
 		if ($rotate === false) {
@@ -269,7 +276,8 @@ class Image implements \JsonSerializable
 	 * @param int $green
 	 * @param int $blue
 	 *
-	 * @throws RuntimeException for image could not to flatten
+	 * @throws RuntimeException for could not create a true color image, could
+	 * not allocate a color or image could not to flatten
 	 *
 	 * @return $this
 	 */
@@ -277,13 +285,20 @@ class Image implements \JsonSerializable
 	{
 		\imagesavealpha($this->instance, false);
 		$image = \imagecreatetruecolor($this->getWidth(), $this->getHeight());
+		if ($image === false) {
+			throw new RuntimeException('Could not create a true color image');
+		}
+		$color = \imagecolorallocate($image, $red, $green, $blue);
+		if ($color === false) {
+			throw new RuntimeException('Image could not allocate a color');
+		}
 		\imagefilledrectangle(
 			$image,
 			0,
 			0,
 			$this->getWidth(),
 			$this->getHeight(),
-			\imagecolorallocate($image, $red, $green, $blue)
+			$color
 		);
 		$copied = \imagecopy(
 			$image,
@@ -415,15 +430,19 @@ class Image implements \JsonSerializable
 	public function opacity(int $opacity = 100)
 	{
 		if ($opacity < 100) {
-			$opacity = \round(\abs(($opacity * 127 / 100) - 127));
+			$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
 			\imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
+			$color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
+			if ($color === false) {
+				throw new RuntimeException('Image could not allocate a color');
+			}
 			\imagefilledrectangle(
 				$this->instance,
 				0,
 				0,
 				$this->getWidth(),
 				$this->getHeight(),
-				\imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity)
+				$color
 			);
 			\imagesavealpha($this->instance, true);
 			\imagealphablending($this->instance, false);
@@ -436,6 +455,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Gets the image resolution.
 	 *
+	 * @throws RuntimeException for image could not get resolution
+	 *
 	 * @return array<string,int> Returns an array containing two keys, horizontal and
 	 * vertical, with integers as values
 	 */
@@ -443,8 +464,12 @@ class Image implements \JsonSerializable
 	public function getResolution() : array
 	{
 		$resolution = \imageresolution($this->instance);
+		if ($resolution === false) {
+			throw new RuntimeException('Image could not to get resolution');
+		}
 		return [
-			'horizontal' => $resolution[0],
+			'horizontal' => $resolution[0], // @phpstan-ignore-line
+			// @phpstan-ignore-next-line
 			'vertical' => $resolution[1],
 		];
 	}
@@ -456,10 +481,7 @@ class Image implements \JsonSerializable
 	 */
 	public function destroy() : bool
 	{
-		if ($this->instance instanceof GdImage) {
-			return \imagedestroy($this->instance);
-		}
-		return true;
+		return \imagedestroy($this->instance);
 	}
 
 	/**
