@@ -82,9 +82,9 @@ final class ImageTest extends TestCase
 		self::assertNotSame($instance, $this->image->getInstance());
 		$this->image->setInstance($instance);
 		self::assertSame($instance, $this->image->getInstance());
-		$this->expectException(\Exception::class);
+		$this->expectException(\TypeError::class);
 		$instance = \fopen(__FILE__, 'rb');
-		$this->image->setInstance($instance);
+		$this->image->setInstance($instance); // @phpstan-ignore-line
 	}
 
 	public function testFileIsNotImage() : void

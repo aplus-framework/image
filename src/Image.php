@@ -190,18 +190,18 @@ class Image implements \JsonSerializable
 	 *
 	 * @param int $width Width in pixels
 	 * @param int $height Height in pixels
-	 * @param int $margin_left Margin left in pixels
-	 * @param int $margin_top Margin top in pixels
+	 * @param int $marginLeft Margin left in pixels
+	 * @param int $marginTop Margin top in pixels
 	 *
 	 * @throws RuntimeException for image could not to crop
 	 *
 	 * @return $this
 	 */
-	public function crop(int $width, int $height, int $margin_left = 0, int $margin_top = 0)
+	public function crop(int $width, int $height, int $marginLeft = 0, int $marginTop = 0)
 	{
 		$crop = \imagecrop($this->instance, [
-			'x' => $margin_left,
-			'y' => $margin_top,
+			'x' => $marginLeft,
+			'y' => $marginTop,
 			'width' => $width,
 			'height' => $height,
 		]);
@@ -324,7 +324,7 @@ class Image implements \JsonSerializable
 	 * Applies a filter to the image.
 	 *
 	 * @param int $type IMG_FILTER_* constants
-	 * @param mixed ...$arguments Arguments for the filter type
+	 * @param int ...$arguments Arguments for the filter type
 	 *
 	 * @see https://secure.php.net/manual/en/function.imagefilter.php
 	 *
@@ -332,7 +332,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @return $this
 	 */
-	public function filter(int $type, ...$arguments)
+	public function filter(int $type, int ...$arguments)
 	{
 		$filtered = \imagefilter($this->instance, $type, ...$arguments);
 		if ($filtered === false) {
@@ -346,7 +346,7 @@ class Image implements \JsonSerializable
 	 *
 	 * @return GdImage GD instance
 	 */
-	public function getInstance()
+	public function getInstance() : GdImage
 	{
 		return $this->instance;
 	}
@@ -356,16 +356,10 @@ class Image implements \JsonSerializable
 	 *
 	 * @param GdImage $instance GD instance
 	 *
-	 * @throws InvalidArgumentException for instance is not of gd type
-	 *
 	 * @return $this
 	 */
-	public function setInstance($instance)
+	public function setInstance(GdImage $instance)
 	{
-		if ( ! $instance instanceof GdImage) {
-			$type = \gettype($instance);
-			throw new InvalidArgumentException('Image instance must be of type "GdImage". "' . $type . '" given');
-		}
 		$this->instance = $instance;
 		return $this;
 	}
@@ -374,26 +368,31 @@ class Image implements \JsonSerializable
 	 * Adds a watermark to the image.
 	 *
 	 * @param Image $watermark The image to use as watermark
-	 * @param int $x Horizontal position
-	 * @param int $y Vertical position
+	 * @param int $marginLeft Horizontal position
+	 * @param int $marginTop Vertical position
 	 *
 	 * @throws RuntimeException for image could not to create watermark
 	 *
 	 * @return $this
 	 */
-	public function watermark(Image $watermark, int $x = 0, int $y = 0)
-	{
-		if ($x < 0) {
-			$x = $this->getWidth() - (-1 * $x + $watermark->getWidth());
+	public function watermark(
+		Image $watermark,
+		int $marginLeft = 0,
+		int $marginTop = 0
+	) {
+		if ($marginLeft < 0) {
+			$marginLeft = $this->getWidth()
+				- (-1 * $marginLeft + $watermark->getWidth());
 		}
-		if ($y < 0) {
-			$y = $this->getHeight() - (-1 * $y + $watermark->getHeight());
+		if ($marginTop < 0) {
+			$marginTop = $this->getHeight()
+				- (-1 * $marginTop + $watermark->getHeight());
 		}
 		$copied = \imagecopy(
 			$this->instance,
 			$watermark->getInstance(),
-			$x,
-			$y,
+			$marginLeft,
+			$marginTop,
 			0,
 			0,
 			$watermark->getWidth(),
@@ -436,7 +435,7 @@ class Image implements \JsonSerializable
 	/**
 	 * Gets the image resolution.
 	 *
-	 * @return array Returns an array containing two keys, horizontal and
+	 * @return array<string,int> Returns an array containing two keys, horizontal and
 	 * vertical, with integers as values
 	 */
 	public function getResolution() : array
