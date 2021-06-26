@@ -1,4 +1,5 @@
-<?php namespace Framework\Image;
+<?php declare(strict_types = 1);
+namespace Framework\Image;
 
 use GdImage;
 use InvalidArgumentException;
