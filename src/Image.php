@@ -140,20 +140,17 @@ class Image implements \JsonSerializable
 	 * Save the Image to a given filename.
 	 *
 	 * @param string|null $filename Optional filename or null to use the original
-	 * @param int|null $quality The quality/compression level.
-	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
-	 * Leave null to use the default.
 	 *
 	 * @throws RuntimeException for image type not available
 	 *
 	 * @return bool
 	 */
-	public function save(string $filename = null, int $quality = null) : bool
+	public function save(string $filename = null) : bool
 	{
-		$filename = $filename ?? $this->filename;
+		$filename ??= $this->filename;
 		return match ($this->type) {
-			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $quality ?? 6),
-			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $quality ?? 75),
+			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
 			\IMAGETYPE_GIF => \imagegif($this->instance, $filename),
 			default => throw new RuntimeException('Image type is not available: ' . $this->type),
 		};
@@ -162,19 +159,15 @@ class Image implements \JsonSerializable
 	/**
 	 * Renders the image output.
 	 *
-	 * @param int|null $quality The quality/compression level.
-	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
-	 * Leave null to use the default.
-	 *
 	 * @throws RuntimeException for image type not available or image could not
 	 * be rendered
 	 *
 	 * @return string The image contents
 	 */
-	public function render(int $quality = null) : string
+	public function render() : string
 	{
 		\ob_start();
-		$status = $this->send($quality);
+		$status = $this->send();
 		$contents = \ob_get_clean();
 		if ($status === false || $contents === false) {
 			throw new RuntimeException('Image could not be rendered');
@@ -185,23 +178,19 @@ class Image implements \JsonSerializable
 	/**
 	 * Output the image to the browser.
 	 *
-	 * @param int|null $quality The quality/compression level.
-	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
-	 * Leave null to use the default.
-	 *
 	 * @throws RuntimeException for image type not available
 	 *
 	 * @return bool
 	 */
-	public function send(int $quality = null) : bool
+	public function send() : bool
 	{
 		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
 			\imagesavealpha($this->instance, true);
 		}
 		// @phpstan-ignore-next-line
 		return match ($this->type) {
-			\IMAGETYPE_PNG => \imagepng($this->instance, null, $quality ?? 6),
-			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $quality ?? 75),
+			\IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
 			\IMAGETYPE_GIF => \imagegif($this->instance),
 			default => throw new RuntimeException('Image type is not available: ' . $this->type),
 		};
