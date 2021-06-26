@@ -105,11 +105,20 @@ final class ImageTest extends TestCase
 
 	public function testOpacityGreatLevel() : void
 	{
-		$this->image->opacity(120);
+		$this->image->opacity();
 		self::assertStringEqualsFile(
 			__DIR__ . '/Support/tree-opacity-g.png',
 			$this->image->render()
 		);
+	}
+
+	public function testOpacityInvalidLevel() : void
+	{
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage(
+			'Opacity percentage must be between 0 and 100, 120 given'
+		);
+		$this->image->opacity(120);
 	}
 
 	public function testScale() : void

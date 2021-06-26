@@ -491,32 +491,37 @@ class Image implements \JsonSerializable
 	/**
 	 * Sets the image opacity level.
 	 *
-	 * @param int $opacity 0 to 100
+	 * @param int $opacity Opacity percentage: from 0 to 100
 	 *
 	 * @return static
 	 */
 	public function opacity(int $opacity = 100) : static
 	{
-		if ($opacity < 100) {
-			$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
-			\imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
-			$color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
-			if ($color === false) {
-				throw new RuntimeException('Image could not allocate a color');
-			}
-			\imagefilledrectangle(
-				$this->instance,
-				0,
-				0,
-				$this->getWidth(),
-				$this->getHeight(),
-				$color
+		if ($opacity < 0 || $opacity > 100) {
+			throw new InvalidArgumentException(
+				'Opacity percentage must be between 0 and 100, ' . $opacity . ' given'
 			);
-			\imagesavealpha($this->instance, true);
-			\imagealphablending($this->instance, false);
-		} else {
-			\imagealphablending($this->instance, true);
 		}
+		if ($opacity === 100) {
+			\imagealphablending($this->instance, true);
+			return $this;
+		}
+		$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
+		\imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
+		$color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
+		if ($color === false) {
+			throw new RuntimeException('Image could not allocate a color');
+		}
+		\imagefilledrectangle(
+			$this->instance,
+			0,
+			0,
+			$this->getWidth(),
+			$this->getHeight(),
+			$color
+		);
+		\imagesavealpha($this->instance, true);
+		\imagealphablending($this->instance, false);
 		return $this;
 	}
 
