@@ -59,7 +59,7 @@ class Image implements \JsonSerializable
 		$info = \getimagesize($this->filename);
 		if ($info === false) {
 			throw new RuntimeException(
-				'Could not get info of the given image filename: ' . $this->filename
+				'Could not get image info from the given filename: ' . $this->filename
 			);
 		}
 		if ( ! (\imagetypes() & $info[2])) {
@@ -141,8 +141,6 @@ class Image implements \JsonSerializable
 	 *
 	 * @param string|null $filename Optional filename or null to use the original
 	 *
-	 * @throws RuntimeException for image type not available
-	 *
 	 * @return bool
 	 */
 	public function save(string $filename = null) : bool
@@ -152,15 +150,14 @@ class Image implements \JsonSerializable
 			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
 			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
 			\IMAGETYPE_GIF => \imagegif($this->instance, $filename),
-			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+			default => false,
 		};
 	}
 
 	/**
 	 * Renders the image output.
 	 *
-	 * @throws RuntimeException for image type not available or image could not
-	 * be rendered
+	 * @throws RuntimeException for image could not be rendered
 	 *
 	 * @return string The image contents
 	 */
@@ -178,8 +175,6 @@ class Image implements \JsonSerializable
 	/**
 	 * Output the image to the browser.
 	 *
-	 * @throws RuntimeException for image type not available
-	 *
 	 * @return bool
 	 */
 	public function send() : bool
@@ -192,7 +187,7 @@ class Image implements \JsonSerializable
 			\IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
 			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
 			\IMAGETYPE_GIF => \imagegif($this->instance),
-			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+			default => false,
 		};
 	}
 
@@ -557,8 +552,6 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * @throws RuntimeException for image cannot render because type not available
-	 *
 	 * @return string
 	 */
 	public function jsonSerialize() : string
@@ -570,8 +563,6 @@ class Image implements \JsonSerializable
 	 * Allow embed the image contents in a document.
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
-	 *
-	 * @throws RuntimeException for image cannot render because type not available
 	 *
 	 * @return string The image data URI
 	 */
