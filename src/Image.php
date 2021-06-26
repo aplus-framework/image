@@ -71,7 +71,7 @@ class Image implements \JsonSerializable
 			\IMAGETYPE_PNG => \imagecreatefrompng($this->filename),
 			\IMAGETYPE_JPEG => \imagecreatefromjpeg($this->filename),
 			\IMAGETYPE_GIF => \imagecreatefromgif($this->filename),
-			default => throw new RuntimeException('Image type is not available: ' . $this->type),
+			default => throw new RuntimeException('Image type is not acceptable: ' . $this->type),
 		};
 		if ( ! $instance instanceof GdImage) {
 			throw new RuntimeException(
@@ -572,24 +572,25 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Indicates if a given filename is an acceptable image.
+	 * Indicates if a given filename has an acceptable image type.
 	 *
 	 * @param string $filename
 	 *
 	 * @return bool
 	 */
-	public static function isImage(string $filename) : bool
+	public static function isAcceptable(string $filename) : bool
 	{
-		if ( ! \is_readable($filename)) {
+		$filename = \realpath($filename);
+		if ($filename === false || ! \is_file($filename) || ! \is_readable($filename)) {
 			return false;
 		}
 		$info = \getimagesize($filename);
 		if ($info === false) {
 			return false;
 		}
-		if ( ! (\imagetypes() & $info[2])) {
-			return false;
-		}
-		return true;
+		return match ($info[2]) {
+			\IMAGETYPE_PNG, \IMAGETYPE_JPEG, \IMAGETYPE_GIF => true,
+			default => false,
+		};
 	}
 }

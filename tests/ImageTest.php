@@ -21,16 +21,16 @@ final class ImageTest extends TestCase
 		\unlink($filename);
 	}
 
-	public function testIsImage() : void
+	public function testIsAcceptable() : void
 	{
 		self::assertTrue(
-			Image::isImage(__DIR__ . '/Support/tree.png')
+			Image::isAcceptable(__DIR__ . '/Support/tree.png')
 		);
 		self::assertFalse(
-			Image::isImage(__FILE__)
+			Image::isAcceptable(__FILE__)
 		);
 		self::assertFalse(
-			Image::isImage('/tmp/unknown')
+			Image::isAcceptable('/tmp/unknown')
 		);
 	}
 
@@ -216,7 +216,7 @@ final class ImageTest extends TestCase
 	{
 		$file = __DIR__ . '/Support/tree.bmp';
 		$this->expectException(\RuntimeException::class);
-		$this->expectExceptionMessage('Image type is not available: 6');
+		$this->expectExceptionMessage('Image type is not acceptable: 6');
 		new Image($file);
 	}
 
