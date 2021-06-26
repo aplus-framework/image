@@ -114,9 +114,9 @@ class Image implements \JsonSerializable
 	 * is not between 0 and 9 or if the image type is JPEG and the value is not
 	 * between 0 and 100
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function setQuality(int $quality)
+	public function setQuality(int $quality) : static
 	{
 		if ($this->type === \IMAGETYPE_GIF) {
 			throw new LogicException(
@@ -241,9 +241,9 @@ class Image implements \JsonSerializable
 	 * @throws InvalidArgumentException for invalid image flip direction
 	 * @throws RuntimeException for image could not to flip
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function flip(string $direction = 'horizontal')
+	public function flip(string $direction = 'horizontal') : static
 	{
 		$direction = match ($direction) {
 			'h', 'horizontal' => \IMG_FLIP_HORIZONTAL,
@@ -268,9 +268,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not to crop
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function crop(int $width, int $height, int $marginLeft = 0, int $marginTop = 0)
+	public function crop(int $width, int $height, int $marginLeft = 0, int $marginTop = 0) : static
 	{
 		$crop = \imagecrop($this->instance, [
 			'x' => $marginLeft,
@@ -294,9 +294,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not to scale
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function scale(int $width, int $height = -1)
+	public function scale(int $width, int $height = -1) : static
 	{
 		$scale = \imagescale($this->instance, $width, $height);
 		if ($scale === false) {
@@ -313,9 +313,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not allocate a color or could not rotate
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function rotate(float $angle)
+	public function rotate(float $angle) : static
 	{
 		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
 			\imagealphablending($this->instance, false);
@@ -347,9 +347,9 @@ class Image implements \JsonSerializable
 	 * @throws RuntimeException for could not create a true color image, could
 	 * not allocate a color or image could not to flatten
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function flatten(int $red = 255, int $green = 255, int $blue = 255)
+	public function flatten(int $red = 255, int $green = 255, int $blue = 255) : static
 	{
 		\imagesavealpha($this->instance, false);
 		$image = \imagecreatetruecolor($this->getWidth(), $this->getHeight());
@@ -393,9 +393,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not to set resolution
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function setResolution(int $horizontal = 96, int $vertical = 96)
+	public function setResolution(int $horizontal = 96, int $vertical = 96) : static
 	{
 		$set = \imageresolution($this->instance, $horizontal, $vertical);
 		if ($set === false) {
@@ -414,9 +414,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not apply the filter
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function filter(int $type, int ...$arguments)
+	public function filter(int $type, int ...$arguments) : static
 	{
 		$filtered = \imagefilter($this->instance, $type, ...$arguments);
 		if ($filtered === false) {
@@ -440,9 +440,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @param GdImage $instance GD instance
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function setInstance(GdImage $instance)
+	public function setInstance(GdImage $instance) : static
 	{
 		$this->instance = $instance;
 		return $this;
@@ -457,13 +457,13 @@ class Image implements \JsonSerializable
 	 *
 	 * @throws RuntimeException for image could not to create watermark
 	 *
-	 * @return $this
+	 * @return static
 	 */
 	public function watermark(
 		Image $watermark,
 		int $horizontalPosition = 0,
 		int $verticalPosition = 0
-	) {
+	) : static {
 		if ($horizontalPosition < 0) {
 			$horizontalPosition = $this->getWidth()
 				- (-1 * $horizontalPosition + $watermark->getWidth());
@@ -493,9 +493,9 @@ class Image implements \JsonSerializable
 	 *
 	 * @param int $opacity 0 to 100
 	 *
-	 * @return $this
+	 * @return static
 	 */
-	public function opacity(int $opacity = 100)
+	public function opacity(int $opacity = 100) : static
 	{
 		if ($opacity < 100) {
 			$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
