@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * Class Image.
  */
-class Image implements \JsonSerializable
+class Image implements \JsonSerializable, \Stringable
 {
 	/**
 	 * Path to the image file.
@@ -86,6 +86,11 @@ class Image implements \JsonSerializable
 	public function __destruct()
 	{
 		$this->destroy();
+	}
+
+	public function __toString() : string
+	{
+		return $this->getDataURL();
 	}
 
 	/**

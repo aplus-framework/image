@@ -214,6 +214,14 @@ final class ImageTest extends TestCase
 		);
 	}
 
+	public function testToString() : void
+	{
+		self::assertStringStartsWith(
+			'data:image/png;base64,',
+			(string) $this->image
+		);
+	}
+
 	public function testFileNotReadable() : void
 	{
 		$this->expectException(\InvalidArgumentException::class);
