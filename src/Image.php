@@ -3,6 +3,7 @@
 use GdImage;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
+use LogicException;
 use RuntimeException;
 
 /**
@@ -28,6 +29,17 @@ class Image implements \JsonSerializable
 	 * @var GdImage
 	 */
 	protected GdImage $instance;
+	/**
+	 * The image quality/compression level.
+	 *
+	 * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
+	 * Null to update to the default when getQuality is called.
+	 *
+	 * @see Image::getQuality
+	 *
+	 * @var int|null
+	 */
+	protected ?int $quality = null;
 
 	/**
 	 * Image constructor.
@@ -72,6 +84,56 @@ class Image implements \JsonSerializable
 	public function __destruct()
 	{
 		$this->destroy();
+	}
+
+	/**
+	 * Gets the image quality/compression level.
+	 *
+	 * @return int|null An integer for PNG and JPEG types or null for GIF
+	 */
+	public function getQuality() : ?int
+	{
+		if ($this->quality === null) {
+			if ($this->type === \IMAGETYPE_PNG) {
+				$this->quality = 6;
+			} elseif ($this->type === \IMAGETYPE_JPEG) {
+				$this->quality = 75;
+			}
+		}
+		return $this->quality;
+	}
+
+	/**
+	 * Sets the image quality/compression level.
+	 *
+	 * @param int $quality The quality/compression level
+	 *
+	 * @throws LogicException when trying to set a quality value for a GIF image
+	 * @throws InvalidArgumentException if the image type is PNG and the value
+	 * is not between 0 and 9 or if the image type is JPEG and the value is not
+	 * between 0 and 100
+	 *
+	 * @return $this
+	 */
+	public function setQuality(int $quality)
+	{
+		if ($this->type === \IMAGETYPE_GIF) {
+			throw new LogicException(
+				'GIF images does not receive a quality value'
+			);
+		}
+		if ($this->type === \IMAGETYPE_PNG && ($quality < 0 || $quality > 9)) {
+			throw new InvalidArgumentException(
+				'PNG images must receive a quality value between 0 and 9, ' . $quality . ' given'
+			);
+		}
+		if ($this->type === \IMAGETYPE_JPEG && ($quality < 0 || $quality > 100)) {
+			throw new InvalidArgumentException(
+				'JPEG images must receive a quality value between 0 and 100, ' . $quality . ' given'
+			);
+		}
+		$this->quality = $quality;
+		return $this;
 	}
 
 	/**
@@ -518,9 +580,9 @@ class Image implements \JsonSerializable
 	/**
 	 * Allow embed the image contents in a document.
 	 *
-	 * @throws RuntimeException for image cannot render because type not available
-	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+	 *
+	 * @throws RuntimeException for image cannot render because type not available
 	 *
 	 * @return string The image data URI
 	 */
