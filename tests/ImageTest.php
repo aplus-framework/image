@@ -87,6 +87,42 @@ final class ImageTest extends TestCase
 		$this->image->setInstance($instance); // @phpstan-ignore-line
 	}
 
+	public function testQualityPng() : void
+	{
+		self::assertSame(6, $this->image->getQuality());
+		$this->image->setQuality(9);
+		self::assertSame(9, $this->image->getQuality());
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage(
+			'PNG images must receive a quality value between 0 and 9, 75 given'
+		);
+		$this->image->setQuality(75);
+	}
+
+	public function testQualityJpeg() : void
+	{
+		$this->image = new Image(__DIR__ . '/Support/tree.jpg');
+		self::assertSame(75, $this->image->getQuality());
+		$this->image->setQuality(100);
+		self::assertSame(100, $this->image->getQuality());
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage(
+			'JPEG images must receive a quality value between 0 and 100, -1 given'
+		);
+		$this->image->setQuality(-1);
+	}
+
+	public function testQualityGif() : void
+	{
+		$this->image = new Image(__DIR__ . '/Support/tree.gif');
+		self::assertNull($this->image->getQuality());
+		$this->expectException(\LogicException::class);
+		$this->expectExceptionMessage(
+			'GIF images does not receive a quality value'
+		);
+		$this->image->setQuality(10);
+	}
+
 	public function testFileIsNotImage() : void
 	{
 		$this->expectException(\RuntimeException::class);
