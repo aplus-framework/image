@@ -45,7 +45,8 @@ class Image implements \JsonSerializable
 	/**
 	 * Image constructor.
 	 *
-	 * @param string $filename Path to the image file
+	 * @param string $filename Path to the image file.
+	 * Acceptable types are: GIF, JPEG and PNG
 	 *
 	 * @throws InvalidArgumentException for invalid file
 	 * @throws RuntimeException for unsupported image type of could not get image info
@@ -85,6 +86,39 @@ class Image implements \JsonSerializable
 	public function __destruct()
 	{
 		$this->destroy();
+	}
+
+	/**
+	 * Destroys the image instance.
+	 *
+	 * @return bool
+	 */
+	public function destroy() : bool
+	{
+		return \imagedestroy($this->instance);
+	}
+
+	/**
+	 * Gets the image GD instance.
+	 *
+	 * @return GdImage GD instance
+	 */
+	public function getInstance() : GdImage
+	{
+		return $this->instance;
+	}
+
+	/**
+	 * Sets the image GD instance.
+	 *
+	 * @param GdImage $instance GD instance
+	 *
+	 * @return static
+	 */
+	public function setInstance(GdImage $instance) : static
+	{
+		$this->instance = $instance;
+		return $this;
 	}
 
 	/**
@@ -138,58 +172,44 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Save the Image to a given filename.
+	 * Gets the image resolution.
 	 *
-	 * @param string|null $filename Optional filename or null to use the original
+	 * @throws RuntimeException for image could not get resolution
 	 *
-	 * @return bool
+	 * @return array<string,int> Returns an array containing two keys, horizontal and
+	 * vertical, with integers as values
 	 */
-	public function save(string $filename = null) : bool
+	#[ArrayShape(['horizontal' => 'int', 'vertical' => 'int'])]
+	public function getResolution() : array
 	{
-		$filename ??= $this->filename;
-		return match ($this->type) {
-			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
-			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
-			\IMAGETYPE_GIF => \imagegif($this->instance, $filename),
-			default => false,
-		};
+		$resolution = \imageresolution($this->instance);
+		if ($resolution === false) {
+			throw new RuntimeException('Image could not to get resolution');
+		}
+		return [
+			'horizontal' => $resolution[0], // @phpstan-ignore-line
+			// @phpstan-ignore-next-line
+			'vertical' => $resolution[1],
+		];
 	}
 
 	/**
-	 * Renders the image output.
+	 * Sets the image resolution.
 	 *
-	 * @throws RuntimeException for image could not be rendered
+	 * @param int $horizontal The horizontal resolution in DPI
+	 * @param int $vertical The vertical resolution in DPI
 	 *
-	 * @return string The image contents
+	 * @throws RuntimeException for image could not to set resolution
+	 *
+	 * @return static
 	 */
-	public function render() : string
+	public function setResolution(int $horizontal = 96, int $vertical = 96) : static
 	{
-		\ob_start();
-		$status = $this->send();
-		$contents = \ob_get_clean();
-		if ($status === false || $contents === false) {
-			throw new RuntimeException('Image could not be rendered');
+		$set = \imageresolution($this->instance, $horizontal, $vertical);
+		if ($set === false) {
+			throw new RuntimeException('Image could not to set resolution');
 		}
-		return $contents;
-	}
-
-	/**
-	 * Output the image to the browser.
-	 *
-	 * @return bool
-	 */
-	public function send() : bool
-	{
-		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
-			\imagesavealpha($this->instance, true);
-		}
-		// @phpstan-ignore-next-line
-		return match ($this->type) {
-			\IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
-			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
-			\IMAGETYPE_GIF => \imagegif($this->instance),
-			default => false,
-		};
+		return $this;
 	}
 
 	/**
@@ -234,28 +254,58 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Flips the image.
+	 * Save the Image to a given filename.
 	 *
-	 * @param string $direction Allowed values are: h or horizontal. v or vertical. b or both.
+	 * @param string|null $filename Optional filename or null to use the original
 	 *
-	 * @throws InvalidArgumentException for invalid image flip direction
-	 * @throws RuntimeException for image could not to flip
-	 *
-	 * @return static
+	 * @return bool
 	 */
-	public function flip(string $direction = 'horizontal') : static
+	public function save(string $filename = null) : bool
 	{
-		$direction = match ($direction) {
-			'h', 'horizontal' => \IMG_FLIP_HORIZONTAL,
-			'v', 'vertical' => \IMG_FLIP_VERTICAL,
-			'b', 'both' => \IMG_FLIP_BOTH,
-			default => throw new InvalidArgumentException('Invalid image flip direction: ' . $direction),
+		$filename ??= $this->filename;
+		return match ($this->type) {
+			\IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
+			\IMAGETYPE_GIF => \imagegif($this->instance, $filename),
+			default => false,
 		};
-		$flip = \imageflip($this->instance, $direction);
-		if ($flip === false) {
-			throw new RuntimeException('Image could not to flip');
+	}
+
+	/**
+	 * Output the image to the browser.
+	 *
+	 * @return bool
+	 */
+	public function send() : bool
+	{
+		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
+			\imagesavealpha($this->instance, true);
 		}
-		return $this;
+		// @phpstan-ignore-next-line
+		return match ($this->type) {
+			\IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
+			\IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
+			\IMAGETYPE_GIF => \imagegif($this->instance),
+			default => false,
+		};
+	}
+
+	/**
+	 * Renders the image output.
+	 *
+	 * @throws RuntimeException for image could not be rendered
+	 *
+	 * @return string The image contents
+	 */
+	public function render() : string
+	{
+		\ob_start();
+		$status = $this->send();
+		$contents = \ob_get_clean();
+		if ($status === false || $contents === false) {
+			throw new RuntimeException('Image could not be rendered');
+		}
+		return $contents;
 	}
 
 	/**
@@ -286,52 +336,48 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Scales the image.
+	 * Flips the image.
 	 *
-	 * @param int $width Width in pixels
-	 * @param int $height Height in pixels. Use -1 to use a proportional height
-	 * based on the width.
+	 * @param string $direction Allowed values are: h or horizontal. v or vertical. b or both.
 	 *
-	 * @throws RuntimeException for image could not to scale
+	 * @throws InvalidArgumentException for invalid image flip direction
+	 * @throws RuntimeException for image could not to flip
 	 *
 	 * @return static
 	 */
-	public function scale(int $width, int $height = -1) : static
+	public function flip(string $direction = 'horizontal') : static
 	{
-		$scale = \imagescale($this->instance, $width, $height);
-		if ($scale === false) {
-			throw new RuntimeException('Image could not to scale');
+		$direction = match ($direction) {
+			'h', 'horizontal' => \IMG_FLIP_HORIZONTAL,
+			'v', 'vertical' => \IMG_FLIP_VERTICAL,
+			'b', 'both' => \IMG_FLIP_BOTH,
+			default => throw new InvalidArgumentException('Invalid image flip direction: ' . $direction),
+		};
+		$flip = \imageflip($this->instance, $direction);
+		if ($flip === false) {
+			throw new RuntimeException('Image could not to flip');
 		}
-		$this->instance = $scale;
 		return $this;
 	}
 
 	/**
-	 * Rotates the image with a given angle.
+	 * Applies a filter to the image.
 	 *
-	 * @param float $angle Rotation angle, in degrees. Clockwise direction.
+	 * @param int $type IMG_FILTER_* constants
+	 * @param int ...$arguments Arguments for the filter type
 	 *
-	 * @throws RuntimeException for image could not allocate a color or could not rotate
+	 * @see https://secure.php.net/manual/en/function.imagefilter.php
+	 *
+	 * @throws RuntimeException for image could not apply the filter
 	 *
 	 * @return static
 	 */
-	public function rotate(float $angle) : static
+	public function filter(int $type, int ...$arguments) : static
 	{
-		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
-			\imagealphablending($this->instance, false);
-			\imagesavealpha($this->instance, true);
-			$background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
-		} else {
-			$background = \imagecolorallocate($this->instance, 255, 255, 255);
+		$filtered = \imagefilter($this->instance, $type, ...$arguments);
+		if ($filtered === false) {
+			throw new RuntimeException('Image could not apply the filter');
 		}
-		if ($background === false) {
-			throw new RuntimeException('Image could not allocate a color');
-		}
-		$rotate = \imagerotate($this->instance, -1 * $angle, $background);
-		if ($rotate === false) {
-			throw new RuntimeException('Image could not to rotate');
-		}
-		$this->instance = $rotate;
 		return $this;
 	}
 
@@ -386,65 +432,89 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Sets the image resolution.
+	 * Sets the image opacity level.
 	 *
-	 * @param int $horizontal The horizontal resolution in DPI
-	 * @param int $vertical The vertical resolution in DPI
-	 *
-	 * @throws RuntimeException for image could not to set resolution
+	 * @param int $opacity Opacity percentage: from 0 to 100
 	 *
 	 * @return static
 	 */
-	public function setResolution(int $horizontal = 96, int $vertical = 96) : static
+	public function opacity(int $opacity = 100) : static
 	{
-		$set = \imageresolution($this->instance, $horizontal, $vertical);
-		if ($set === false) {
-			throw new RuntimeException('Image could not to set resolution');
+		if ($opacity < 0 || $opacity > 100) {
+			throw new InvalidArgumentException(
+				'Opacity percentage must be between 0 and 100, ' . $opacity . ' given'
+			);
 		}
+		if ($opacity === 100) {
+			\imagealphablending($this->instance, true);
+			return $this;
+		}
+		$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
+		\imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
+		$color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
+		if ($color === false) {
+			throw new RuntimeException('Image could not allocate a color');
+		}
+		\imagefilledrectangle(
+			$this->instance,
+			0,
+			0,
+			$this->getWidth(),
+			$this->getHeight(),
+			$color
+		);
+		\imagesavealpha($this->instance, true);
+		\imagealphablending($this->instance, false);
 		return $this;
 	}
 
 	/**
-	 * Applies a filter to the image.
+	 * Rotates the image with a given angle.
 	 *
-	 * @param int $type IMG_FILTER_* constants
-	 * @param int ...$arguments Arguments for the filter type
+	 * @param float $angle Rotation angle, in degrees. Clockwise direction.
 	 *
-	 * @see https://secure.php.net/manual/en/function.imagefilter.php
-	 *
-	 * @throws RuntimeException for image could not apply the filter
+	 * @throws RuntimeException for image could not allocate a color or could not rotate
 	 *
 	 * @return static
 	 */
-	public function filter(int $type, int ...$arguments) : static
+	public function rotate(float $angle) : static
 	{
-		$filtered = \imagefilter($this->instance, $type, ...$arguments);
-		if ($filtered === false) {
-			throw new RuntimeException('Image could not apply the filter');
+		if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
+			\imagealphablending($this->instance, false);
+			\imagesavealpha($this->instance, true);
+			$background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
+		} else {
+			$background = \imagecolorallocate($this->instance, 255, 255, 255);
 		}
+		if ($background === false) {
+			throw new RuntimeException('Image could not allocate a color');
+		}
+		$rotate = \imagerotate($this->instance, -1 * $angle, $background);
+		if ($rotate === false) {
+			throw new RuntimeException('Image could not to rotate');
+		}
+		$this->instance = $rotate;
 		return $this;
 	}
 
 	/**
-	 * Gets the image GD instance.
+	 * Scales the image.
 	 *
-	 * @return GdImage GD instance
-	 */
-	public function getInstance() : GdImage
-	{
-		return $this->instance;
-	}
-
-	/**
-	 * Sets the image GD instance.
+	 * @param int $width Width in pixels
+	 * @param int $height Height in pixels. Use -1 to use a proportional height
+	 * based on the width.
 	 *
-	 * @param GdImage $instance GD instance
+	 * @throws RuntimeException for image could not to scale
 	 *
 	 * @return static
 	 */
-	public function setInstance(GdImage $instance) : static
+	public function scale(int $width, int $height = -1) : static
 	{
-		$this->instance = $instance;
+		$scale = \imagescale($this->instance, $width, $height);
+		if ($scale === false) {
+			throw new RuntimeException('Image could not to scale');
+		}
+		$this->instance = $scale;
 		return $this;
 	}
 
@@ -489,83 +559,6 @@ class Image implements \JsonSerializable
 	}
 
 	/**
-	 * Sets the image opacity level.
-	 *
-	 * @param int $opacity Opacity percentage: from 0 to 100
-	 *
-	 * @return static
-	 */
-	public function opacity(int $opacity = 100) : static
-	{
-		if ($opacity < 0 || $opacity > 100) {
-			throw new InvalidArgumentException(
-				'Opacity percentage must be between 0 and 100, ' . $opacity . ' given'
-			);
-		}
-		if ($opacity === 100) {
-			\imagealphablending($this->instance, true);
-			return $this;
-		}
-		$opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
-		\imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
-		$color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
-		if ($color === false) {
-			throw new RuntimeException('Image could not allocate a color');
-		}
-		\imagefilledrectangle(
-			$this->instance,
-			0,
-			0,
-			$this->getWidth(),
-			$this->getHeight(),
-			$color
-		);
-		\imagesavealpha($this->instance, true);
-		\imagealphablending($this->instance, false);
-		return $this;
-	}
-
-	/**
-	 * Gets the image resolution.
-	 *
-	 * @throws RuntimeException for image could not get resolution
-	 *
-	 * @return array<string,int> Returns an array containing two keys, horizontal and
-	 * vertical, with integers as values
-	 */
-	#[ArrayShape(['horizontal' => 'int', 'vertical' => 'int'])]
-	public function getResolution() : array
-	{
-		$resolution = \imageresolution($this->instance);
-		if ($resolution === false) {
-			throw new RuntimeException('Image could not to get resolution');
-		}
-		return [
-			'horizontal' => $resolution[0], // @phpstan-ignore-line
-			// @phpstan-ignore-next-line
-			'vertical' => $resolution[1],
-		];
-	}
-
-	/**
-	 * Destroys the image instance.
-	 *
-	 * @return bool
-	 */
-	public function destroy() : bool
-	{
-		return \imagedestroy($this->instance);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function jsonSerialize() : string
-	{
-		return $this->getDataURL();
-	}
-
-	/**
 	 * Allow embed the image contents in a document.
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
@@ -576,6 +569,14 @@ class Image implements \JsonSerializable
 	public function getDataURL() : string
 	{
 		return 'data:' . $this->getMime() . ';base64,' . \base64_encode($this->render());
+	}
+
+	/**
+	 * @return string
+	 */
+	public function jsonSerialize() : string
+	{
+		return $this->getDataURL();
 	}
 
 	/**
