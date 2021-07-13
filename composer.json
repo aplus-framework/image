@@ -1,7 +1,7 @@
 {
-    "name": "natanfelles/image",
+    "name": "aplus/image",
     "type": "library",
-    "description": "The Framework Image Library",
+    "description": "Aplus Framework Image Library",
     "keywords": [
         "image",
         "opacity",
@@ -10,7 +10,7 @@
         "flatten",
         "gd"
     ],
-    "homepage": "https://the-framework.gitlab.io/libraries/image.html",
+    "homepage": "https://aplus-framework.com/docs/image",
     "license": "MIT",
     "authors": [
         {
@@ -52,9 +52,9 @@
     "prefer-stable": true,
     "support": {
         "email": "natanfelles@gmail.com",
-        "issues": "https://gitlab.com/the-framework/libraries/image/issues",
-        "wiki": "https://gitlab.com/the-framework/libraries/image/wikis/home",
-        "source": "https://gitlab.com/the-framework/libraries/image",
-        "docs": "https://the-framework.gitlab.io/libraries/image/docs/"
+        "issues": "https://gitlab.com/aplus-framework/libraries/image/issues",
+        "wiki": "https://gitlab.com/aplus-framework/libraries/image/wikis/home",
+        "source": "https://gitlab.com/aplus-framework/libraries/image",
+        "docs": "https://aplus-framework.gitlab.io/libraries/image/docs/"
     }
 }
