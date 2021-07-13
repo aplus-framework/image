@@ -1,4 +1,4 @@
-# The Framework Image Library
+# Aplus Framework Image Library
 
 - [Homepage](https://the-framework.gitlab.io/libraries/image.html)
 - [API Documentation](https://the-framework.gitlab.io/libraries/image/docs/)
