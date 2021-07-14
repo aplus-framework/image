@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of The Framework Image Library.
+ * This file is part of Aplus Framework Image Library.
  *
  * (c) Natan Felles <natanfelles@gmail.com>
  *
