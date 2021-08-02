@@ -99,7 +99,7 @@ class Image implements \JsonSerializable, \Stringable
 
     public function __toString() : string
     {
-        return $this->getDataURL();
+        return $this->getDataUrl();
     }
 
     /**
@@ -585,7 +585,7 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return string The image "data" URL
      */
-    public function getDataURL() : string
+    public function getDataUrl() : string
     {
         return 'data:' . $this->getMime() . ';base64,' . \base64_encode($this->render());
     }
@@ -595,7 +595,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function jsonSerialize() : string
     {
-        return $this->getDataURL();
+        return $this->getDataUrl();
     }
 
     /**
