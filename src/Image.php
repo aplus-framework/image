@@ -18,6 +18,8 @@ use RuntimeException;
 
 /**
  * Class Image.
+ *
+ * @package image
  */
 class Image implements \JsonSerializable, \Stringable
 {
