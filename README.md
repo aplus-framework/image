@@ -1,7 +1,6 @@
 # Aplus Framework Image Library
 
-- [Homepage](https://aplus-framework.com/docs/image)
-- [API Documentation](https://aplus-framework.gitlab.io/libraries/image/docs/)
+- [Documentation](https://docs.aplus-framework.com/guides/libraries/image/)
 
 [![Pipeline](https://gitlab.com/aplus-framework/libraries/image/badges/master/pipeline.svg)](https://gitlab.com/aplus-framework/libraries/image/-/pipelines?scope=branches)
 [![Coverage](https://gitlab.com/aplus-framework/libraries/image/badges/master/coverage.svg?job=test:php)](https://aplus-framework.gitlab.io/libraries/image/coverage/)
