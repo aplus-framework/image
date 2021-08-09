@@ -16,7 +16,7 @@
             <source dsn=".">
                 <path>src</path>
             </source>
-            <default-package-name>Image</default-package-name>
+            <default-package-name>image</default-package-name>
             <include-source>true</include-source>
         </api>
         <guide>
