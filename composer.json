@@ -10,7 +10,7 @@
         "flatten",
         "gd"
     ],
-    "homepage": "https://aplus-framework.com/docs/image",
+    "homepage": "https://docs.aplus-framework.com/guides/libraries/image/",
     "license": "MIT",
     "authors": [
         {
@@ -55,6 +55,6 @@
         "issues": "https://gitlab.com/aplus-framework/libraries/image/issues",
         "wiki": "https://gitlab.com/aplus-framework/libraries/image/wikis/home",
         "source": "https://gitlab.com/aplus-framework/libraries/image",
-        "docs": "https://aplus-framework.gitlab.io/libraries/image/docs/"
+        "docs": "https://docs.aplus-framework.com/guides/libraries/image/"
     }
 }
