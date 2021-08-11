@@ -318,18 +318,31 @@ Rendering Methods
 Send
 ^^^^
 
-When necessary, it is possible to send the Image contents directly to the browser,
-User-Agent:
+When necessary, it is possible to send the Image contents directly to the
+PHP Output Buffer, to the User-Agent, to the browser...
 
 .. code-block:: php
 
     $image->send(); // bool
 
+Save
+^^^^
+
+To save the Image contents in a file, use the ``save`` method:
+
+.. code-block:: php
+
+    $image->save($filename); // bool
+
+The $filename argument is optional.
+
+The default $filename value is ``null``, which indicates to save the contents in
+the original file set in the constructor.
+
 Render
 ^^^^^^
 
-If it is not necessary to send the Image contents to the PHP Output Buffer,
-but wants to save the contents in a variable, use the ``render`` method:
+When need to set the Image contents in a variable, use the ``render`` method:
 
 .. code-block:: php
 
@@ -398,6 +411,12 @@ The $dataUrl value will be like:
 .. code-block::
 
     data:image/png;base64,...
+
+**Usage with HTML**
+
+.. code-block:: php
+
+    <img src="<?= $image ?>">
 
 Conclusion
 ----------
