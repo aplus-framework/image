@@ -302,7 +302,6 @@ class Image implements \JsonSerializable, \Stringable
         if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
             \imagesavealpha($this->instance, true);
         }
-        // @phpstan-ignore-next-line
         return match ($this->type) {
             \IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
             \IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
