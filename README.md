@@ -1,3 +1,5 @@
+<a href="https://gitlab.com/aplus-framework/libraries/image"><img src="https://gitlab.com/aplus-framework/libraries/image/-/raw/master/guide/image.png" alt="Aplus Framework Image Library" align="right" width="100"></a>
+
 # Aplus Framework Image Library
 
 - [User Guide](https://docs.aplus-framework.com/guides/libraries/image/index.html)
