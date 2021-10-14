@@ -56,5 +56,11 @@
         "wiki": "https://gitlab.com/aplus-framework/libraries/image/wikis/home",
         "source": "https://gitlab.com/aplus-framework/libraries/image",
         "docs": "https://docs.aplus-framework.com/guides/libraries/image/"
-    }
+    },
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://www.paypal.com/donate/?hosted_button_id=NGBNW5PY4VSJ4"
+        }
+    ]
 }
