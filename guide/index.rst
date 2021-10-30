@@ -1,6 +1,9 @@
 Image
 =====
 
+.. image:: image.png
+    :alt: Aplus Framework Image Library
+
 Aplus Framework Image Library.
 
 - `Installation`_
