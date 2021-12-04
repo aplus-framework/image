@@ -2,6 +2,7 @@
 
 # Aplus Framework Image Library
 
+- [Homepage](https://aplus-framework.com/packages/image)
 - [User Guide](https://docs.aplus-framework.com/guides/libraries/image/index.html)
 - [API Documentation](https://docs.aplus-framework.com/packages/image.html)
 
