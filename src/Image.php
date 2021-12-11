@@ -36,9 +36,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     protected string $mime;
     /**
-     * GD instance.
-     *
-     * @var GdImage
+     * GdImage instance.
      */
     protected GdImage $instance;
     /**
@@ -47,9 +45,7 @@ class Image implements \JsonSerializable, \Stringable
      * 0 to 9 on PNG, default is 6. 0 to 100 on JPEG, default is 75.
      * Null to update to the default when getQuality is called.
      *
-     * @see Image::getQuality
-     *
-     * @var int|null
+     * @see Image::getQuality()
      */
     protected ?int $quality = null;
 
@@ -105,7 +101,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Destroys the image instance.
+     * Destroys the GdImage instance.
      *
      * @return bool
      */
@@ -115,9 +111,9 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Gets the image GD instance.
+     * Gets the GdImage instance.
      *
-     * @return GdImage GD instance
+     * @return GdImage GdImage instance
      */
     #[Pure]
     public function getInstance() : GdImage
@@ -126,9 +122,9 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Sets the image GD instance.
+     * Sets the GdImage instance.
      *
-     * @param GdImage $instance GD instance
+     * @param GdImage $instance GdImage instance
      *
      * @return static
      */
@@ -230,7 +226,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Get image height.
+     * Gets the image height.
      *
      * @return int
      */
@@ -241,7 +237,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Get image width.
+     * Gets the image width.
      *
      * @return int
      */
@@ -252,7 +248,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Get file extension for image type.
+     * Gets the file extension for image type.
      *
      * @return false|string a string with the extension corresponding to the
      * given image type or false on fail
@@ -275,7 +271,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Save the Image to a given filename.
+     * Saves the image contents to a given filename.
      *
      * @param string|null $filename Optional filename or null to use the original
      *
@@ -293,7 +289,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Output the image to the browser.
+     * Sends the image contents to the output buffer.
      *
      * @return bool
      */
@@ -311,7 +307,7 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Renders the image output.
+     * Renders the image contents.
      *
      * @throws RuntimeException for image could not be rendered
      *
@@ -386,7 +382,7 @@ class Image implements \JsonSerializable, \Stringable
      * @param int $type IMG_FILTER_* constants
      * @param int ...$arguments Arguments for the filter type
      *
-     * @see https://secure.php.net/manual/en/function.imagefilter.php
+     * @see https://www.php.net/manual/en/function.imagefilter.php
      *
      * @throws RuntimeException for image could not apply the filter
      *
@@ -404,7 +400,7 @@ class Image implements \JsonSerializable, \Stringable
     /**
      * Flattens the image.
      *
-     * Replaces transparency with a RGB color.
+     * Replaces transparency with an RGB color.
      *
      * @param int $red
      * @param int $green
