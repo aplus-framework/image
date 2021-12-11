@@ -1,0 +1,90 @@
+<?php
+/*
+ * This file is part of Aplus Framework Image Library.
+ *
+ * (c) Natan Felles <natanfelles@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+namespace PHPSTORM_META;
+
+registerArgumentsSet(
+    'flip_directions',
+    'b',
+    'both',
+    'h',
+    'horizontal',
+    'v',
+    'vertical',
+);
+registerArgumentsSet(
+    'filter_types',
+    \IMG_FILTER_NEGATE,
+    \IMG_FILTER_GRAYSCALE,
+    \IMG_FILTER_BRIGHTNESS,
+    \IMG_FILTER_CONTRAST,
+    \IMG_FILTER_COLORIZE,
+    \IMG_FILTER_EDGEDETECT,
+    \IMG_FILTER_EMBOSS,
+    \IMG_FILTER_GAUSSIAN_BLUR,
+    \IMG_FILTER_SELECTIVE_BLUR,
+    \IMG_FILTER_MEAN_REMOVAL,
+    \IMG_FILTER_SMOOTH,
+    \IMG_FILTER_PIXELATE,
+    \IMG_FILTER_SCATTER,
+);
+registerArgumentsSet(
+    'filter_arg1',
+    \IMG_FILTER_BRIGHTNESS,
+    \IMG_FILTER_CONTRAST,
+    \IMG_FILTER_COLORIZE,
+    \IMG_FILTER_SMOOTH,
+    \IMG_FILTER_PIXELATE,
+    \IMG_FILTER_SCATTER,
+);
+registerArgumentsSet(
+    'filter_arg2',
+    \IMG_FILTER_COLORIZE,
+    \IMG_FILTER_PIXELATE,
+    \IMG_FILTER_SCATTER,
+);
+registerArgumentsSet(
+    'filter_arg3',
+    \IMG_FILTER_COLORIZE,
+    \IMG_FILTER_SCATTER,
+);
+registerArgumentsSet(
+    'filter_arg4',
+    \IMG_FILTER_COLORIZE,
+);
+expectedArguments(
+    \Framework\Image\Image::flip(),
+    0,
+    argumentsSet('flip_directions')
+);
+expectedArguments(
+    \Framework\Image\Image::filter(),
+    0,
+    argumentsSet('filter_types')
+);
+expectedArguments(
+    \Framework\Image\Image::filter(),
+    1,
+    argumentsSet('filter_arg1')
+);
+expectedArguments(
+    \Framework\Image\Image::filter(),
+    2,
+    argumentsSet('filter_arg2')
+);
+expectedArguments(
+    \Framework\Image\Image::filter(),
+    3,
+    argumentsSet('filter_arg3')
+);
+expectedArguments(
+    \Framework\Image\Image::filter(),
+    4,
+    argumentsSet('filter_arg4')
+);
