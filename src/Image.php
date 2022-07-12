@@ -549,7 +549,8 @@ class Image implements \JsonSerializable, \Stringable
         Image $watermark,
         int $horizontalPosition = 0,
         int $verticalPosition = 0
-    ) : static {
+    ) : static
+    {
         if ($horizontalPosition < 0) {
             $horizontalPosition = $this->getWidth()
                 - (-1 * $horizontalPosition + $watermark->getWidth());
