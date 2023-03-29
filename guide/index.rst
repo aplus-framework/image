@@ -74,7 +74,7 @@ Gets the image resolution.
 
 .. code-block:: php
 
-    $resolution = $image->getResolution(); // int[]
+    $resolution = $image->getResolution(); // array of integers
 
 The $resolution value will be an array like the following:
 
@@ -92,7 +92,7 @@ Gets the image quality/compression level.
 
 .. code-block:: php
 
-    $quality = $image->getQuality(); // int|null
+    $quality = $image->getQuality(); // int or null
 
 - Returns an integer for PNG and JPEG types or null for GIF.
 
@@ -114,7 +114,7 @@ Gets a file extension based in the image type.
 
 .. code-block:: php
 
-    $extension = $image->getExtension(); // string|false
+    $extension = $image->getExtension(); // string or false
 
 - Returns a string with the extension (e.g. *.png*) or false on fail.
 
@@ -304,7 +304,11 @@ Adds a watermark to the image.
     $watermark->scale(100);
     $horizontalPosition = -10;
     $verticalPosition = -10;
-    $image->watermark($watermark, $horizontalPosition, $verticalPosition); // static
+    $image->watermark(
+        $watermark,
+        $horizontalPosition,
+        $verticalPosition
+    ); // static
 
 - Watermark must be an Image instance.
 - Horizontal position direction is left-to-right when the value is positive, otherwise is right-to-left.
