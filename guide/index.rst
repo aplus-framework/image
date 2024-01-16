@@ -435,5 +435,5 @@ The more you use it, the more you will learn.
 .. note::
     Did you find something wrong? 
     Be sure to let us know about it with an
-    `issue <https://gitlab.com/aplus-framework/libraries/image/issues>`_. 
+    `issue <https://github.com/aplus-framework/image/issues>`_. 
     Thank you!
