@@ -177,9 +177,6 @@ final class ImageTest extends TestCase
 
     public function testRotate() : void
     {
-        /*if (\getenv('GITHUB_JOB')) {
-            $this->markTestSkipped();
-        }*/
         $this->image->rotate(45);
         self::assertStringEqualsFile(
             __DIR__ . '/Support/tree-rotate.png',
@@ -216,9 +213,6 @@ final class ImageTest extends TestCase
 
     public function testCrop() : void
     {
-        /*if (\getenv('GITHUB_JOB')) {
-            $this->markTestSkipped();
-        }*/
         $this->image->crop(200, 200, 100, 100);
         self::assertStringEqualsFile(
             __DIR__ . '/Support/tree-crop.png',
