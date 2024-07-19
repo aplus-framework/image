@@ -61,7 +61,7 @@ class Image implements \JsonSerializable, \Stringable
     public function __construct(string $filename)
     {
         $realpath = \realpath($filename);
-        if ($realpath === false || ! \is_file($realpath) || ! \is_readable($realpath)) {
+        if ($realpath === false || !\is_file($realpath) || !\is_readable($realpath)) {
             throw new InvalidArgumentException('File does not exists or is not readable: ' . $filename);
         }
         $this->filename = $realpath;
@@ -71,7 +71,7 @@ class Image implements \JsonSerializable, \Stringable
                 'Could not get image info from the given filename: ' . $this->filename
             );
         }
-        if ( ! (\imagetypes() & $info[2])) {
+        if (!(\imagetypes() & $info[2])) {
             throw new RuntimeException('Unsupported image type: ' . $info[2]);
         }
         $this->type = $info[2];
@@ -82,7 +82,7 @@ class Image implements \JsonSerializable, \Stringable
             \IMAGETYPE_GIF => \imagecreatefromgif($this->filename),
             default => throw new RuntimeException('Image type is not acceptable: ' . $this->type),
         };
-        if ( ! $instance instanceof GdImage) {
+        if (!$instance instanceof GdImage) {
             throw new RuntimeException(
                 "Image of type '{$this->type}' does not returned a GdImage instance"
             );
@@ -605,7 +605,7 @@ class Image implements \JsonSerializable, \Stringable
     public static function isAcceptable(string $filename) : bool
     {
         $filename = \realpath($filename);
-        if ($filename === false || ! \is_file($filename) || ! \is_readable($filename)) {
+        if ($filename === false || !\is_file($filename) || !\is_readable($filename)) {
             return false;
         }
         $info = \getimagesize($filename);
