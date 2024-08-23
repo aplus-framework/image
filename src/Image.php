@@ -254,7 +254,7 @@ class Image implements \JsonSerializable, \Stringable
      * given image type or false on fail
      */
     #[Pure]
-    public function getExtension() : string | false
+    public function getExtension() : false | string
     {
         return \image_type_to_extension($this->type);
     }
@@ -277,7 +277,7 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return bool
      */
-    public function save(string $filename = null) : bool
+    public function save(?string $filename = null) : bool
     {
         $filename ??= $this->filename;
         return match ($this->type) {
