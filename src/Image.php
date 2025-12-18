@@ -90,11 +90,6 @@ class Image implements \JsonSerializable, \Stringable
         $this->instance = $instance;
     }
 
-    public function __destruct()
-    {
-        $this->destroy();
-    }
-
     public function __toString() : string
     {
         return $this->getDataUrl();
@@ -104,6 +99,10 @@ class Image implements \JsonSerializable, \Stringable
      * Destroys the GdImage instance.
      *
      * @return bool
+     *
+     * @deprecated
+     *
+     * @codeCoverageIgnore
      */
     public function destroy() : bool
     {

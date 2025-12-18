@@ -78,12 +78,6 @@ final class ImageTest extends TestCase
         //$this->image->setResolution(0);
     }
 
-    public function testDestroy() : void
-    {
-        self::assertTrue($this->image->destroy());
-        self::assertTrue($this->image->destroy());
-    }
-
     public function testInstance() : void
     {
         self::assertInstanceOf(\GdImage::class, $this->image->getInstance());
