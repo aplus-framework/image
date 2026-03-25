@@ -11,6 +11,7 @@ namespace Tests\Image;
 
 use Framework\Image\Image;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 final class ImageTest extends TestCase
 {
@@ -141,7 +142,7 @@ final class ImageTest extends TestCase
 
     public function testFileIsNotImage() : void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         new Image(__FILE__);
     }
 
@@ -282,7 +283,7 @@ final class ImageTest extends TestCase
     public function testUnsupportedType() : void
     {
         $file = __DIR__ . '/Support/tree.bmp';
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Image type is not acceptable: 6');
         new Image($file);
     }
@@ -309,5 +310,18 @@ final class ImageTest extends TestCase
         $image = new Image($file);
         self::assertTrue($image->save());
         $image->render();
+    }
+
+    public function testCreate() : void
+    {
+        $filename = \sys_get_temp_dir() . '/aplus-image-test';
+        $this->image->create('png', $filename);
+        $this->image->create('jpeg', $filename);
+        $this->image->create('gif', $filename);
+        $this->image->create('avif', $filename);
+        \unlink($filename);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Image could not be created');
+        $this->image->create('foo', $filename);
     }
 }

@@ -265,6 +265,27 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
+     * Creates a new Image based in the current instance.
+     *
+     * @param int|string $type The new Image type
+     * @param string $filename The filename where the new Image will be placed
+     */
+    public function create(int | string $type, string $filename) : Image
+    {
+        $created = match ($type) {
+            \IMAGETYPE_PNG, 'png' => \imagepng($this->instance, $filename),
+            \IMAGETYPE_JPEG, 'jpeg' => \imagejpeg($this->instance, $filename),
+            \IMAGETYPE_GIF, 'gif' => \imagegif($this->instance, $filename),
+            \IMAGETYPE_AVIF, 'avif' => \imageavif($this->instance, $filename),
+            default => false,
+        };
+        if($created === false) {
+            throw new RuntimeException('Image could not be created');
+        }
+        return new Image($filename);
+    }
+
+    /**
      * Saves the image contents to a given filename.
      *
      * @param string|null $filename Optional filename or null to use the original
