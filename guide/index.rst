@@ -40,7 +40,7 @@ Instantiating a new Image
 Detecting if a file is Acceptable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Indicates if a given file has an acceptable (PNG, JPEG or GIF) image type.
+Indicates if a given file has an acceptable (AVIF, PNG, JPEG or GIF) image type.
 
 .. code-block:: php
 
@@ -94,7 +94,7 @@ Gets the image quality/compression level.
 
     $quality = $image->getQuality(); // int or null
 
-- Returns an integer for PNG and JPEG types or null for GIF.
+- Returns an integer for AVIF, PNG and JPEG types or null for GIF.
 
 Get MIME Type
 ^^^^^^^^^^^^^
@@ -142,6 +142,7 @@ Sets the image quality/compression level.
 - The quality value must not be set on GIF images.
 - PNG images must have a value between 0 and 9.
 - JPEG images must have a value between 0 and 100.
+- AVIF images must have a value between 0 and 100.
 
 Set Resolution
 ^^^^^^^^^^^^^^
