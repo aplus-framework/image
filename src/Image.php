@@ -53,7 +53,7 @@ class Image implements \JsonSerializable, \Stringable
      * Image constructor.
      *
      * @param string $filename Path to the image file.
-     * Acceptable types are: GIF, JPEG and PNG
+     * Acceptable types are: AVIF, GIF, JPEG and PNG
      *
      * @throws InvalidArgumentException for invalid file
      * @throws RuntimeException for unsupported image type of could not get image info
@@ -123,7 +123,7 @@ class Image implements \JsonSerializable, \Stringable
     /**
      * Gets the image quality/compression level.
      *
-     * @return int|null An integer for PNG and JPEG types or null for GIF
+     * @return int|null An integer for AVIF, JPEG and PNG types or null for GIF
      */
     public function getQuality() : ?int
     {
@@ -146,7 +146,8 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @throws LogicException when trying to set a quality value for a GIF image
      * @throws InvalidArgumentException if the image type is PNG and the value
-     * is not between 0 and 9 or if the image type is JPEG and the value is not
+     * is not between 0 and 9, if the image type is JPEG and the value is not
+     * between 0 and 100 or if the image type is AVIF and the value is not
      * between 0 and 100
      *
      * @return static
