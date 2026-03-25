@@ -126,6 +126,19 @@ final class ImageTest extends TestCase
         $this->image->setQuality(10);
     }
 
+    public function testQualityAvif() : void
+    {
+        $this->image = new Image(__DIR__ . '/Support/tree.avif');
+        self::assertSame(52, $this->image->getQuality());
+        $this->image->setQuality(90);
+        self::assertSame(90, $this->image->getQuality());
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'AVIF images must receive a quality value between 0 and 100, -1 given'
+        );
+        $this->image->setQuality(-1);
+    }
+
     public function testFileIsNotImage() : void
     {
         $this->expectException(\RuntimeException::class);
@@ -285,6 +298,14 @@ final class ImageTest extends TestCase
     public function testGifType() : void
     {
         $file = __DIR__ . '/Support/tree.gif';
+        $image = new Image($file);
+        self::assertTrue($image->save());
+        $image->render();
+    }
+
+    public function testAvifType() : void
+    {
+        $file = __DIR__ . '/Support/tree.avif';
         $image = new Image($file);
         self::assertTrue($image->save());
         $image->render();

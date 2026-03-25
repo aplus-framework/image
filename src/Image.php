@@ -80,6 +80,7 @@ class Image implements \JsonSerializable, \Stringable
             \IMAGETYPE_PNG => \imagecreatefrompng($this->filename),
             \IMAGETYPE_JPEG => \imagecreatefromjpeg($this->filename),
             \IMAGETYPE_GIF => \imagecreatefromgif($this->filename),
+            \IMAGETYPE_AVIF => \imagecreatefromavif($this->filename),
             default => throw new RuntimeException('Image type is not acceptable: ' . $this->type),
         };
         if (!$instance instanceof GdImage) {
@@ -145,6 +146,8 @@ class Image implements \JsonSerializable, \Stringable
                 $this->quality = 6;
             } elseif ($this->type === \IMAGETYPE_JPEG) {
                 $this->quality = 75;
+            } elseif ($this->type === \IMAGETYPE_AVIF) {
+                $this->quality = 52;
             }
         }
         return $this->quality;
@@ -177,6 +180,11 @@ class Image implements \JsonSerializable, \Stringable
         if ($this->type === \IMAGETYPE_JPEG && ($quality < 0 || $quality > 100)) {
             throw new InvalidArgumentException(
                 'JPEG images must receive a quality value between 0 and 100, ' . $quality . ' given'
+            );
+        }
+        if ($this->type === \IMAGETYPE_AVIF && ($quality < 0 || $quality > 100)) {
+            throw new InvalidArgumentException(
+                'AVIF images must receive a quality value between 0 and 100, ' . $quality . ' given'
             );
         }
         $this->quality = $quality;
@@ -283,6 +291,7 @@ class Image implements \JsonSerializable, \Stringable
             \IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
             \IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
             \IMAGETYPE_GIF => \imagegif($this->instance, $filename),
+            \IMAGETYPE_AVIF => \imageavif($this->instance, $filename, $this->getQuality()),
             default => false,
         };
     }
@@ -294,13 +303,14 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function send() : bool
     {
-        if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
+        if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF, \IMAGETYPE_AVIF], true)) {
             \imagesavealpha($this->instance, true);
         }
         return match ($this->type) {
             \IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
             \IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
             \IMAGETYPE_GIF => \imagegif($this->instance),
+            \IMAGETYPE_AVIF => \imageavif($this->instance, null, $this->getQuality()),
             default => false,
         };
     }
@@ -494,7 +504,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function rotate(float $angle) : static
     {
-        if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF], true)) {
+        if (\in_array($this->type, [\IMAGETYPE_PNG, \IMAGETYPE_GIF, \IMAGETYPE_AVIF], true)) {
             \imagealphablending($this->instance, false);
             \imagesavealpha($this->instance, true);
             $background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
@@ -612,7 +622,7 @@ class Image implements \JsonSerializable, \Stringable
             return false;
         }
         return match ($info[2]) {
-            \IMAGETYPE_PNG, \IMAGETYPE_JPEG, \IMAGETYPE_GIF => true,
+            \IMAGETYPE_PNG, \IMAGETYPE_JPEG, \IMAGETYPE_GIF, \IMAGETYPE_AVIF => true,
             default => false,
         };
     }
