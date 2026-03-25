@@ -338,7 +338,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function send() : bool
     {
-        if (\in_array($this->getType(), [\IMAGETYPE_PNG, \IMAGETYPE_GIF, \IMAGETYPE_AVIF], true)) {
+        if ($this->hasAlpha()) {
             \imagesavealpha($this->instance, true);
         }
         return match ($this->getType()) {
@@ -539,7 +539,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function rotate(float $angle) : static
     {
-        if (\in_array($this->getType(), [\IMAGETYPE_PNG, \IMAGETYPE_GIF, \IMAGETYPE_AVIF], true)) {
+        if ($this->hasAlpha()) {
             \imagealphablending($this->instance, false);
             \imagesavealpha($this->instance, true);
             $background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
@@ -555,6 +555,19 @@ class Image implements \JsonSerializable, \Stringable
         }
         $this->instance = $rotate;
         return $this;
+    }
+
+    public function hasAlpha() : bool
+    {
+        return \in_array(
+            $this->getType(),
+            [
+                \IMAGETYPE_PNG,
+                \IMAGETYPE_GIF,
+                \IMAGETYPE_AVIF,
+            ],
+            true
+        );
     }
 
     /**
