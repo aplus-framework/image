@@ -128,11 +128,11 @@ class Image implements \JsonSerializable, \Stringable
     public function getQuality() : ?int
     {
         if ($this->quality === null) {
-            if ($this->getType() === \IMAGETYPE_PNG) {
+            if ($this->isType(\IMAGETYPE_PNG)) {
                 $this->quality = 6;
-            } elseif ($this->getType() === \IMAGETYPE_JPEG) {
+            } elseif ($this->isType(\IMAGETYPE_JPEG)) {
                 $this->quality = 75;
-            } elseif ($this->getType() === \IMAGETYPE_AVIF) {
+            } elseif ($this->isType(\IMAGETYPE_AVIF)) {
                 $this->quality = 52;
             }
         }
@@ -154,22 +154,22 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function setQuality(int $quality) : static
     {
-        if ($this->getType() === \IMAGETYPE_GIF) {
+        if ($this->isType(\IMAGETYPE_GIF)) {
             throw new LogicException(
                 'GIF images does not receive a quality value'
             );
         }
-        if ($this->getType() === \IMAGETYPE_PNG && ($quality < 0 || $quality > 9)) {
+        if ($this->isType(\IMAGETYPE_PNG) && ($quality < 0 || $quality > 9)) {
             throw new InvalidArgumentException(
                 'PNG images must receive a quality value between 0 and 9, ' . $quality . ' given'
             );
         }
-        if ($this->getType() === \IMAGETYPE_JPEG && ($quality < 0 || $quality > 100)) {
+        if ($this->isType(\IMAGETYPE_JPEG) && ($quality < 0 || $quality > 100)) {
             throw new InvalidArgumentException(
                 'JPEG images must receive a quality value between 0 and 100, ' . $quality . ' given'
             );
         }
-        if ($this->getType() === \IMAGETYPE_AVIF && ($quality < 0 || $quality > 100)) {
+        if ($this->isType(\IMAGETYPE_AVIF) && ($quality < 0 || $quality > 100)) {
             throw new InvalidArgumentException(
                 'AVIF images must receive a quality value between 0 and 100, ' . $quality . ' given'
             );
@@ -284,6 +284,11 @@ class Image implements \JsonSerializable, \Stringable
     {
         $this->type = $type;
         return $this;
+    }
+
+    public function isType(int $type) : bool
+    {
+        return $this->getType() === $type;
     }
 
     /**

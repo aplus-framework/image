@@ -316,9 +316,17 @@ final class ImageTest extends TestCase
     {
         $filename = \sys_get_temp_dir() . '/aplus-image-test';
         $this->image->create('png', $filename);
+        $img = new Image($filename);
+        self::assertTrue($img->isType(\IMAGETYPE_PNG));
         $this->image->create('jpeg', $filename);
+        $img = new Image($filename);
+        self::assertTrue($img->isType(\IMAGETYPE_JPEG));
         $this->image->create('gif', $filename);
+        $img = new Image($filename);
+        self::assertTrue($img->isType(\IMAGETYPE_GIF));
         $this->image->create('avif', $filename);
+        $img = new Image($filename);
+        self::assertTrue($img->isType(\IMAGETYPE_AVIF));
         \unlink($filename);
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Image could not be created');
