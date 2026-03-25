@@ -97,20 +97,6 @@ class Image implements \JsonSerializable, \Stringable
     }
 
     /**
-     * Destroys the GdImage instance.
-     *
-     * @return bool
-     *
-     * @deprecated
-     *
-     * @codeCoverageIgnore
-     */
-    public function destroy() : bool
-    {
-        return \imagedestroy($this->instance);
-    }
-
-    /**
      * Gets the GdImage instance.
      *
      * @return GdImage GdImage instance
