@@ -75,7 +75,7 @@ class Image implements \JsonSerializable, \Stringable
             throw new RuntimeException('Unsupported image type: ' . $info[2]);
         }
         $this->setType($info[2]);
-        $this->mime = $info['mime'];
+        $this->setMime($info['mime']);
         $instance = match ($this->getType()) {
             \IMAGETYPE_PNG => \imagecreatefrompng($this->filename),
             \IMAGETYPE_JPEG => \imagecreatefromjpeg($this->filename),
@@ -262,6 +262,12 @@ class Image implements \JsonSerializable, \Stringable
     public function getMime() : string
     {
         return $this->mime;
+    }
+
+    protected function setMime(string $mime) : static
+    {
+        $this->mime = $mime;
+        return $this;
     }
 
     /**
