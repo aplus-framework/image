@@ -539,13 +539,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function rotate(float $angle) : static
     {
-        if ($this->hasAlpha()) {
-            \imagealphablending($this->instance, false);
-            \imagesavealpha($this->instance, true);
-            $background = \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
-        } else {
-            $background = \imagecolorallocate($this->instance, 255, 255, 255);
-        }
+        $background = $this->allocateBackground();
         if ($background === false) {
             throw new RuntimeException('Image could not allocate a color');
         }
@@ -555,6 +549,16 @@ class Image implements \JsonSerializable, \Stringable
         }
         $this->instance = $rotate;
         return $this;
+    }
+
+    protected function allocateBackground() : false | int
+    {
+        if ($this->hasAlpha()) {
+            \imagealphablending($this->instance, false);
+            \imagesavealpha($this->instance, true);
+            return \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
+        }
+        return \imagecolorallocate($this->instance, 255, 255, 255);
     }
 
     public function hasAlpha() : bool
