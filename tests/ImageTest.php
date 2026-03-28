@@ -192,6 +192,16 @@ final class ImageTest extends TestCase
         );
     }
 
+    public function testRotateWithWitheBackground() : void
+    {
+        $image = new Image(__DIR__ . '/Support/tree.jpg');
+        $image->rotate(45);
+        self::assertStringEqualsFile(
+            __DIR__ . '/Support/tree-rotate.jpg',
+            $image->render()
+        );
+    }
+
     public function testFlipHorizontal() : void
     {
         $this->image->flip();
