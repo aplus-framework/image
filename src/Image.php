@@ -88,7 +88,7 @@ class Image implements \JsonSerializable, \Stringable
                 "Image of type '{$this->getType()}' does not returned a GdImage instance"
             );
         }
-        $this->instance = $instance;
+        $this->setInstance($instance);
     }
 
     public function __toString() : string
@@ -391,7 +391,7 @@ class Image implements \JsonSerializable, \Stringable
         if ($crop === false) {
             throw new RuntimeException('Image could not to crop');
         }
-        $this->instance = $crop;
+        $this->setInstance($crop);
         return $this;
     }
 
@@ -487,7 +487,7 @@ class Image implements \JsonSerializable, \Stringable
         if ($copied === false) {
             throw new RuntimeException('Image could not to flatten');
         }
-        $this->instance = $image;
+        $this->setInstance($image);
         return $this;
     }
 
@@ -547,7 +547,7 @@ class Image implements \JsonSerializable, \Stringable
         if ($rotate === false) {
             throw new RuntimeException('Image could not to rotate');
         }
-        $this->instance = $rotate;
+        $this->setInstance($rotate);
         return $this;
     }
 
@@ -591,7 +591,7 @@ class Image implements \JsonSerializable, \Stringable
         if ($scale === false) {
             throw new RuntimeException('Image could not to scale');
         }
-        $this->instance = $scale;
+        $this->setInstance($scale);
         return $this;
     }
 
