@@ -60,15 +60,11 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function __construct(string $filename)
     {
-        $realpath = \realpath($filename);
-        if ($realpath === false || !\is_file($realpath) || !\is_readable($realpath)) {
-            throw new InvalidArgumentException('File does not exists or is not readable: ' . $filename);
-        }
-        $this->filename = $realpath;
-        $info = \getimagesize($this->filename);
+        $this->setFilename($filename);
+        $info = \getimagesize($this->getFilename());
         if ($info === false) {
             throw new RuntimeException(
-                'Could not get image info from the given filename: ' . $this->filename
+                'Could not get image info from the given filename: ' . $this->getFilename()
             );
         }
         if (!(\imagetypes() & $info[2])) {
@@ -77,10 +73,10 @@ class Image implements \JsonSerializable, \Stringable
         $this->setType($info[2]);
         $this->setMime($info['mime']);
         $instance = match ($this->getType()) {
-            \IMAGETYPE_PNG => \imagecreatefrompng($this->filename),
-            \IMAGETYPE_JPEG => \imagecreatefromjpeg($this->filename),
-            \IMAGETYPE_GIF => \imagecreatefromgif($this->filename),
-            \IMAGETYPE_AVIF => \imagecreatefromavif($this->filename),
+            \IMAGETYPE_PNG => \imagecreatefrompng($this->getFilename()),
+            \IMAGETYPE_JPEG => \imagecreatefromjpeg($this->getFilename()),
+            \IMAGETYPE_GIF => \imagecreatefromgif($this->getFilename()),
+            \IMAGETYPE_AVIF => \imagecreatefromavif($this->getFilename()),
             default => throw new RuntimeException('Image type is not acceptable: ' . $this->getType()),
         };
         if (!$instance instanceof GdImage) {
@@ -94,6 +90,21 @@ class Image implements \JsonSerializable, \Stringable
     public function __toString() : string
     {
         return $this->getDataUrl();
+    }
+
+    public function getFilename() : string
+    {
+        return $this->filename;
+    }
+
+    protected function setFilename(string $filename) : static
+    {
+        $realpath = \realpath($filename);
+        if ($realpath === false || !\is_file($realpath) || !\is_readable($realpath)) {
+            throw new InvalidArgumentException('File does not exists or is not readable: ' . $filename);
+        }
+        $this->filename = $realpath;
+        return $this;
     }
 
     /**
@@ -321,7 +332,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function save(?string $filename = null) : bool
     {
-        $filename ??= $this->filename;
+        $filename ??= $this->getFilename();
         return match ($this->getType()) {
             \IMAGETYPE_PNG => \imagepng($this->getInstance(), $filename, $this->getQuality()),
             \IMAGETYPE_JPEG => \imagejpeg($this->getInstance(), $filename, $this->getQuality()),
