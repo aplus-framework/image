@@ -189,7 +189,7 @@ class Image implements \JsonSerializable, \Stringable
     #[ArrayShape(['horizontal' => 'int', 'vertical' => 'int'])]
     public function getResolution() : array
     {
-        $resolution = \imageresolution($this->instance);
+        $resolution = \imageresolution($this->getInstance());
         if ($resolution === false) {
             throw new RuntimeException('Image could not to get resolution');
         }
@@ -212,7 +212,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function setResolution(int $horizontal = 96, int $vertical = 96) : static
     {
-        $set = \imageresolution($this->instance, $horizontal, $vertical);
+        $set = \imageresolution($this->getInstance(), $horizontal, $vertical);
         if ($set === false) {
             throw new RuntimeException('Image could not to set resolution');
         }
@@ -227,7 +227,7 @@ class Image implements \JsonSerializable, \Stringable
     #[Pure]
     public function getHeight() : int
     {
-        return \imagesy($this->instance);
+        return \imagesy($this->getInstance());
     }
 
     /**
@@ -238,7 +238,7 @@ class Image implements \JsonSerializable, \Stringable
     #[Pure]
     public function getWidth() : int
     {
-        return \imagesx($this->instance);
+        return \imagesx($this->getInstance());
     }
 
     /**
@@ -300,10 +300,10 @@ class Image implements \JsonSerializable, \Stringable
     public function create(int | string $type, string $filename) : Image
     {
         $created = match ($type) {
-            \IMAGETYPE_PNG, 'png' => \imagepng($this->instance, $filename),
-            \IMAGETYPE_JPEG, 'jpeg' => \imagejpeg($this->instance, $filename),
-            \IMAGETYPE_GIF, 'gif' => \imagegif($this->instance, $filename),
-            \IMAGETYPE_AVIF, 'avif' => \imageavif($this->instance, $filename),
+            \IMAGETYPE_PNG, 'png' => \imagepng($this->getInstance(), $filename),
+            \IMAGETYPE_JPEG, 'jpeg' => \imagejpeg($this->getInstance(), $filename),
+            \IMAGETYPE_GIF, 'gif' => \imagegif($this->getInstance(), $filename),
+            \IMAGETYPE_AVIF, 'avif' => \imageavif($this->getInstance(), $filename),
             default => false,
         };
         if($created === false) {
@@ -323,10 +323,10 @@ class Image implements \JsonSerializable, \Stringable
     {
         $filename ??= $this->filename;
         return match ($this->getType()) {
-            \IMAGETYPE_PNG => \imagepng($this->instance, $filename, $this->getQuality()),
-            \IMAGETYPE_JPEG => \imagejpeg($this->instance, $filename, $this->getQuality()),
-            \IMAGETYPE_GIF => \imagegif($this->instance, $filename),
-            \IMAGETYPE_AVIF => \imageavif($this->instance, $filename, $this->getQuality()),
+            \IMAGETYPE_PNG => \imagepng($this->getInstance(), $filename, $this->getQuality()),
+            \IMAGETYPE_JPEG => \imagejpeg($this->getInstance(), $filename, $this->getQuality()),
+            \IMAGETYPE_GIF => \imagegif($this->getInstance(), $filename),
+            \IMAGETYPE_AVIF => \imageavif($this->getInstance(), $filename, $this->getQuality()),
             default => false,
         };
     }
@@ -339,13 +339,13 @@ class Image implements \JsonSerializable, \Stringable
     public function send() : bool
     {
         if ($this->hasAlpha()) {
-            \imagesavealpha($this->instance, true);
+            \imagesavealpha($this->getInstance(), true);
         }
         return match ($this->getType()) {
-            \IMAGETYPE_PNG => \imagepng($this->instance, null, $this->getQuality()),
-            \IMAGETYPE_JPEG => \imagejpeg($this->instance, null, $this->getQuality()),
-            \IMAGETYPE_GIF => \imagegif($this->instance),
-            \IMAGETYPE_AVIF => \imageavif($this->instance, null, $this->getQuality()),
+            \IMAGETYPE_PNG => \imagepng($this->getInstance(), null, $this->getQuality()),
+            \IMAGETYPE_JPEG => \imagejpeg($this->getInstance(), null, $this->getQuality()),
+            \IMAGETYPE_GIF => \imagegif($this->getInstance()),
+            \IMAGETYPE_AVIF => \imageavif($this->getInstance(), null, $this->getQuality()),
             default => false,
         };
     }
@@ -382,7 +382,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function crop(int $width, int $height, int $marginLeft = 0, int $marginTop = 0) : static
     {
-        $crop = \imagecrop($this->instance, [
+        $crop = \imagecrop($this->getInstance(), [
             'x' => $marginLeft,
             'y' => $marginTop,
             'width' => $width,
@@ -413,7 +413,7 @@ class Image implements \JsonSerializable, \Stringable
             'b', 'both' => \IMG_FLIP_BOTH,
             default => throw new InvalidArgumentException('Invalid image flip direction: ' . $direction),
         };
-        $flip = \imageflip($this->instance, $direction);
+        $flip = \imageflip($this->getInstance(), $direction);
         if ($flip === false) {
             throw new RuntimeException('Image could not to flip');
         }
@@ -434,7 +434,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function filter(int $type, int ...$arguments) : static
     {
-        $filtered = \imagefilter($this->instance, $type, ...$arguments);
+        $filtered = \imagefilter($this->getInstance(), $type, ...$arguments);
         if ($filtered === false) {
             throw new RuntimeException('Image could not apply the filter');
         }
@@ -457,7 +457,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function flatten(int $red = 255, int $green = 255, int $blue = 255) : static
     {
-        \imagesavealpha($this->instance, false);
+        \imagesavealpha($this->getInstance(), false);
         $image = \imagecreatetruecolor($this->getWidth(), $this->getHeight());
         if ($image === false) {
             throw new RuntimeException('Could not create a true color image');
@@ -476,7 +476,7 @@ class Image implements \JsonSerializable, \Stringable
         );
         $copied = \imagecopy(
             $image,
-            $this->instance,
+            $this->getInstance(),
             0,
             0,
             0,
@@ -506,25 +506,25 @@ class Image implements \JsonSerializable, \Stringable
             );
         }
         if ($opacity === 100) {
-            \imagealphablending($this->instance, true);
+            \imagealphablending($this->getInstance(), true);
             return $this;
         }
         $opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
-        \imagelayereffect($this->instance, \IMG_EFFECT_OVERLAY);
-        $color = \imagecolorallocatealpha($this->instance, 127, 127, 127, $opacity);
+        \imagelayereffect($this->getInstance(), \IMG_EFFECT_OVERLAY);
+        $color = \imagecolorallocatealpha($this->getInstance(), 127, 127, 127, $opacity);
         if ($color === false) {
             throw new RuntimeException('Image could not allocate a color');
         }
         \imagefilledrectangle(
-            $this->instance,
+            $this->getInstance(),
             0,
             0,
             $this->getWidth(),
             $this->getHeight(),
             $color
         );
-        \imagesavealpha($this->instance, true);
-        \imagealphablending($this->instance, false);
+        \imagesavealpha($this->getInstance(), true);
+        \imagealphablending($this->getInstance(), false);
         return $this;
     }
 
@@ -543,7 +543,7 @@ class Image implements \JsonSerializable, \Stringable
         if ($background === false) {
             throw new RuntimeException('Image could not allocate a color');
         }
-        $rotate = \imagerotate($this->instance, -1 * $angle, $background);
+        $rotate = \imagerotate($this->getInstance(), -1 * $angle, $background);
         if ($rotate === false) {
             throw new RuntimeException('Image could not to rotate');
         }
@@ -554,11 +554,11 @@ class Image implements \JsonSerializable, \Stringable
     protected function allocateBackground() : false | int
     {
         if ($this->hasAlpha()) {
-            \imagealphablending($this->instance, false);
-            \imagesavealpha($this->instance, true);
-            return \imagecolorallocatealpha($this->instance, 0, 0, 0, 127);
+            \imagealphablending($this->getInstance(), false);
+            \imagesavealpha($this->getInstance(), true);
+            return \imagecolorallocatealpha($this->getInstance(), 0, 0, 0, 127);
         }
-        return \imagecolorallocate($this->instance, 255, 255, 255);
+        return \imagecolorallocate($this->getInstance(), 255, 255, 255);
     }
 
     public function hasAlpha() : bool
@@ -587,7 +587,7 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function scale(int $width, int $height = -1) : static
     {
-        $scale = \imagescale($this->instance, $width, $height);
+        $scale = \imagescale($this->getInstance(), $width, $height);
         if ($scale === false) {
             throw new RuntimeException('Image could not to scale');
         }
@@ -620,7 +620,7 @@ class Image implements \JsonSerializable, \Stringable
                 - (-1 * $verticalPosition + $watermark->getHeight());
         }
         $copied = \imagecopy(
-            $this->instance,
+            $this->getInstance(),
             $watermark->getInstance(),
             $horizontalPosition,
             $verticalPosition,
