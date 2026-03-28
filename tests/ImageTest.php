@@ -10,6 +10,7 @@
 namespace Tests\Image;
 
 use Framework\Image\Image;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -96,7 +97,7 @@ final class ImageTest extends TestCase
         self::assertSame(6, $this->image->getQuality());
         $this->image->setQuality(9);
         self::assertSame(9, $this->image->getQuality());
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'PNG images must receive a quality value between 0 and 9, 75 given'
         );
@@ -109,7 +110,7 @@ final class ImageTest extends TestCase
         self::assertSame(75, $this->image->getQuality());
         $this->image->setQuality(100);
         self::assertSame(100, $this->image->getQuality());
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'JPEG images must receive a quality value between 0 and 100, -1 given'
         );
@@ -133,7 +134,7 @@ final class ImageTest extends TestCase
         self::assertSame(52, $this->image->getQuality());
         $this->image->setQuality(90);
         self::assertSame(90, $this->image->getQuality());
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'AVIF images must receive a quality value between 0 and 100, -1 given'
         );
@@ -166,7 +167,7 @@ final class ImageTest extends TestCase
 
     public function testOpacityInvalidLevel() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Opacity percentage must be between 0 and 100, 120 given'
         );
@@ -229,6 +230,13 @@ final class ImageTest extends TestCase
         );
     }
 
+    public function testInvalidFlipDirection() : void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid image flip direction: foo');
+        $this->image->flip('foo');
+    }
+
     public function testCrop() : void
     {
         $this->image->crop(200, 200, 100, 100);
@@ -285,7 +293,7 @@ final class ImageTest extends TestCase
 
     public function testFileNotReadable() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('File does not exists or is not readable: /tmp/foo');
         new Image('/tmp/foo');
     }
@@ -298,28 +306,19 @@ final class ImageTest extends TestCase
         new Image($file);
     }
 
-    public function testJpgType() : void
+    /**
+     * @dataProvider imageTypesProvider
+     *
+     * @param string $extension
+     */
+    public function testTypes(string $extension) : void
     {
-        $file = __DIR__ . '/Support/tree.jpg';
-        $image = new Image($file);
+        $filename = __DIR__ . '/Support/tree' . $extension;
+        $backup = \file_get_contents($filename);
+        $image = new Image($filename);
         self::assertTrue($image->save());
         $image->render();
-    }
-
-    public function testGifType() : void
-    {
-        $file = __DIR__ . '/Support/tree.gif';
-        $image = new Image($file);
-        self::assertTrue($image->save());
-        $image->render();
-    }
-
-    public function testAvifType() : void
-    {
-        $file = __DIR__ . '/Support/tree.avif';
-        $image = new Image($file);
-        self::assertTrue($image->save());
-        $image->render();
+        \file_put_contents($filename, $backup);
     }
 
     public function testCreate() : void
@@ -341,5 +340,18 @@ final class ImageTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Image could not be created');
         $this->image->create('foo', $filename);
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function imageTypesProvider() : array
+    {
+        return [
+            ['.png'],
+            ['.jpg'],
+            ['.gif'],
+            ['.avif'],
+        ];
     }
 }
