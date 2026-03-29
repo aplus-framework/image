@@ -80,9 +80,7 @@ class Image implements \JsonSerializable, \Stringable
             default => throw new RuntimeException('Image type is not acceptable: ' . $this->getType()),
         };
         if (!$instance instanceof GdImage) {
-            throw new RuntimeException(
-                "Image of type '{$this->getType()}' does not returned a GdImage instance"
-            );
+            throw new RuntimeException("Image of type '{$this->getType()}' does not returned a GdImage instance");
         }
         $this->setInstance($instance);
     }
