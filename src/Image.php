@@ -123,7 +123,7 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return static
      */
-    public function setInstance(GdImage $instance) : static
+    protected function setInstance(GdImage $instance) : static
     {
         $this->instance = $instance;
         return $this;

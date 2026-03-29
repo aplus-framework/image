@@ -83,13 +83,6 @@ final class ImageTest extends TestCase
     public function testInstance() : void
     {
         self::assertInstanceOf(\GdImage::class, $this->image->getInstance());
-        $instance = \imagecreatefrompng(__DIR__ . '/Support/tree.png');
-        self::assertNotSame($instance, $this->image->getInstance());
-        $this->image->setInstance($instance); // @phpstan-ignore-line
-        self::assertSame($instance, $this->image->getInstance());
-        $this->expectException(\TypeError::class);
-        $instance = \fopen(__FILE__, 'rb');
-        $this->image->setInstance($instance); // @phpstan-ignore-line
     }
 
     public function testQualityPng() : void
