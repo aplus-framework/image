@@ -199,9 +199,6 @@ class Image implements \JsonSerializable, \Stringable
     public function getResolution() : array
     {
         $resolution = \imageresolution($this->getInstance());
-        if ($resolution === false) {
-            throw new RuntimeException('Image could not to get resolution');
-        }
         return [
             'horizontal' => $resolution[0], // @phpstan-ignore-line
             // @phpstan-ignore-next-line
@@ -221,17 +218,14 @@ class Image implements \JsonSerializable, \Stringable
      */
     public function setResolution(int $horizontal = 96, int $vertical = 96) : static
     {
-        $set = \imageresolution($this->getInstance(), $horizontal, $vertical);
-        if ($set === false) {
-            throw new RuntimeException('Image could not to set resolution');
-        }
+        \imageresolution($this->getInstance(), $horizontal, $vertical);
         return $this;
     }
 
     /**
      * Gets the image height.
      *
-     * @return int
+     * @return int<1,max>
      */
     #[Pure]
     public function getHeight() : int
@@ -242,7 +236,7 @@ class Image implements \JsonSerializable, \Stringable
     /**
      * Gets the image width.
      *
-     * @return int
+     * @return int<1,max>
      */
     #[Pure]
     public function getWidth() : int
@@ -422,10 +416,7 @@ class Image implements \JsonSerializable, \Stringable
             'b', 'both' => \IMG_FLIP_BOTH,
             default => throw new InvalidArgumentException('Invalid image flip direction: ' . $direction),
         };
-        $flip = \imageflip($this->getInstance(), $direction);
-        if ($flip === false) {
-            throw new RuntimeException('Image could not to flip');
-        }
+        \imageflip($this->getInstance(), $direction);
         return $this;
     }
 
@@ -455,9 +446,9 @@ class Image implements \JsonSerializable, \Stringable
      *
      * Replaces transparency with an RGB color.
      *
-     * @param int $red
-     * @param int $green
-     * @param int $blue
+     * @param int<0,255> $red
+     * @param int<0,255> $green
+     * @param int<0,255> $blue
      *
      * @throws RuntimeException for could not create a true color image, could
      * not allocate a color or image could not to flatten
@@ -483,7 +474,7 @@ class Image implements \JsonSerializable, \Stringable
             $this->getHeight(),
             $color
         );
-        $copied = \imagecopy(
+        \imagecopy(
             $image,
             $this->getInstance(),
             0,
@@ -493,9 +484,6 @@ class Image implements \JsonSerializable, \Stringable
             $this->getWidth(),
             $this->getHeight()
         );
-        if ($copied === false) {
-            throw new RuntimeException('Image could not to flatten');
-        }
         $this->setInstance($image);
         return $this;
     }
@@ -518,9 +506,9 @@ class Image implements \JsonSerializable, \Stringable
             \imagealphablending($this->getInstance(), true);
             return $this;
         }
-        $opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
         \imagelayereffect($this->getInstance(), \IMG_EFFECT_OVERLAY);
-        $color = \imagecolorallocatealpha($this->getInstance(), 127, 127, 127, $opacity);
+        $opacity = (int) \round(\abs(($opacity * 127 / 100) - 127));
+        $color = \imagecolorallocatealpha($this->getInstance(), 127, 127, 127, $opacity); // @phpstan-ignore-line
         if ($color === false) {
             throw new RuntimeException('Image could not allocate a color');
         }
@@ -628,7 +616,7 @@ class Image implements \JsonSerializable, \Stringable
             $verticalPosition = $this->getHeight()
                 - (-1 * $verticalPosition + $watermark->getHeight());
         }
-        $copied = \imagecopy(
+        \imagecopy(
             $this->getInstance(),
             $watermark->getInstance(),
             $horizontalPosition,
@@ -638,9 +626,6 @@ class Image implements \JsonSerializable, \Stringable
             $watermark->getWidth(),
             $watermark->getHeight()
         );
-        if ($copied === false) {
-            throw new RuntimeException('Image could not to create watermark');
-        }
         return $this;
     }
 
