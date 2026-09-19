@@ -11,7 +11,6 @@ namespace Framework\Image;
 
 use GdImage;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use LogicException;
 use RuntimeException;
@@ -192,10 +191,12 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @throws RuntimeException for image could not get resolution
      *
-     * @return array<string,int> Returns an array containing two keys, horizontal and
-     * vertical, with integers as values
+     * @return array{
+     *      horizontal: int,
+     *      vertical: int,
+     * } Returns an array containing two keys, horizontal and vertical, with
+     * integers as values
      */
-    #[ArrayShape(['horizontal' => 'int', 'vertical' => 'int'])]
     public function getResolution() : array
     {
         $resolution = \imageresolution($this->getInstance());
@@ -491,13 +492,13 @@ class Image implements \JsonSerializable, \Stringable
     /**
      * Sets the image opacity level.
      *
-     * @param int $opacity Opacity percentage: from 0 to 100
+     * @param int<0,100> $opacity Opacity percentage: from 0 to 100
      *
      * @return static
      */
     public function opacity(int $opacity = 100) : static
     {
-        if ($opacity < 0 || $opacity > 100) {
+        if ($opacity < 0 || $opacity > 100) { // @phpstan-ignore-line
             throw new InvalidArgumentException(
                 'Opacity percentage must be between 0 and 100, ' . $opacity . ' given'
             );

@@ -164,7 +164,7 @@ final class ImageTest extends TestCase
         $this->expectExceptionMessage(
             'Opacity percentage must be between 0 and 100, 120 given'
         );
-        $this->image->opacity(120);
+        $this->image->opacity(120); // @phpstan-ignore-line
     }
 
     public function testScale() : void
