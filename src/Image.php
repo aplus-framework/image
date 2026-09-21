@@ -11,7 +11,6 @@ namespace Framework\Image;
 
 use GdImage;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\Pure;
 use LogicException;
 use RuntimeException;
 
@@ -109,7 +108,6 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return GdImage GdImage instance
      */
-    #[Pure]
     public function getInstance() : GdImage
     {
         return $this->instance;
@@ -228,7 +226,6 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return int<1,max>
      */
-    #[Pure]
     public function getHeight() : int
     {
         return \imagesy($this->getInstance());
@@ -239,7 +236,6 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return int<1,max>
      */
-    #[Pure]
     public function getWidth() : int
     {
         return \imagesx($this->getInstance());
@@ -251,7 +247,6 @@ class Image implements \JsonSerializable, \Stringable
      * @return false|string a string with the extension corresponding to the
      * given image type or false on fail
      */
-    #[Pure]
     public function getExtension() : false | string
     {
         return \image_type_to_extension($this->getType());
@@ -262,7 +257,6 @@ class Image implements \JsonSerializable, \Stringable
      *
      * @return string
      */
-    #[Pure]
     public function getMime() : string
     {
         return $this->mime;
