@@ -50,7 +50,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Framework\\Image\\": "src/"
+            "Aplus\\Image\\": "src/"
         }
     },
     "autoload-dev": {
