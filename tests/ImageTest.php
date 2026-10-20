@@ -9,7 +9,7 @@
  */
 namespace Tests\Image;
 
-use Framework\Image\Image;
+use Aplus\Image\Image;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
