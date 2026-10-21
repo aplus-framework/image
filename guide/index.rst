@@ -31,7 +31,7 @@ Instantiating a new Image
     <?php
     require __DIR__ . '/vendor/autoload.php';
 
-    use Framework\Image\Image;
+    use Aplus\Image\Image;
 
     $filename = __DIR__ . '/tree.png';
 
