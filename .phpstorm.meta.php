@@ -59,32 +59,32 @@ registerArgumentsSet(
     \IMG_FILTER_COLORIZE,
 );
 expectedArguments(
-    \Framework\Image\Image::flip(),
+    \Aplus\Image\Image::flip(),
     0,
     argumentsSet('flip_directions')
 );
 expectedArguments(
-    \Framework\Image\Image::filter(),
+    \Aplus\Image\Image::filter(),
     0,
     argumentsSet('filter_types')
 );
 expectedArguments(
-    \Framework\Image\Image::filter(),
+    \Aplus\Image\Image::filter(),
     1,
     argumentsSet('filter_arg1')
 );
 expectedArguments(
-    \Framework\Image\Image::filter(),
+    \Aplus\Image\Image::filter(),
     2,
     argumentsSet('filter_arg2')
 );
 expectedArguments(
-    \Framework\Image\Image::filter(),
+    \Aplus\Image\Image::filter(),
     3,
     argumentsSet('filter_arg3')
 );
 expectedArguments(
-    \Framework\Image\Image::filter(),
+    \Aplus\Image\Image::filter(),
     4,
     argumentsSet('filter_arg4')
 );
